@@ -218,6 +218,24 @@
     }
   }
 
+  /* 📲 --- PREVENIR SOBREPOSICIÓN EN MODO HORIZONTAL --- */
+  @media (max-width: 768px) and (orientation: landscape) {
+    .container {
+      flex-direction: column;
+    }
+    .texto-lateral {
+      order: 2;
+      margin-top: 15px;
+    }
+    #ruleta {
+      order: 1;
+      width: 60vw;
+    }
+    .flecha {
+      order: 0;
+    }
+  }
+
   @media (max-width: 480px) {
     h1 {
       font-size: 1.2em;
@@ -255,6 +273,7 @@
     <!-- Texto -->
     <div class="texto-lateral">
       <p><strong>Lector de emociones:</strong><br>Instrumento para identificar emociones.</p>
+      <!-- BOTÓN DE INSTRUCCIONES TAMBIÉN EN PC Y TABLETA -->
       <button class="boton-instrucciones" id="btnInstrucciones">Instrucciones</button>
     </div>
 
