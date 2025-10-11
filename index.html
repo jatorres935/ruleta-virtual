@@ -70,17 +70,6 @@
     line-height: 1.4;
   }
 
-  .texto-lateral img {
-    width: 100%;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: transform 0.3s;
-  }
-
-  .texto-lateral img:hover {
-    transform: scale(1.03);
-  }
-
   .botones {
     position: absolute;
     right: 5%;
@@ -106,6 +95,24 @@
     background-color: #0056b3;
   }
 
+  /* --- NUEVO BOTÓN DE INSTRUCCIONES --- */
+  .boton-instrucciones {
+    background-color: #28a745;
+    border: none;
+    color: white;
+    font-size: 1em;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 15px;
+  }
+
+  .boton-instrucciones:hover {
+    background-color: #1e7e34;
+  }
+
+  /* --- MODAL --- */
   .modal {
     display: none;
     position: fixed;
@@ -148,13 +155,6 @@
   }
 
   /* 📱 --- OPTIMIZACIÓN RESPONSIVA --- */
-  @media (max-width: 1024px) {
-    .flecha {
-      right: 25%;
-      border-left: 50px solid black;
-    }
-  }
-
   @media (max-width: 768px) {
     .container {
       flex-direction: column;
@@ -184,15 +184,17 @@
       height: auto;
     }
 
+    /* --- FLECHA ARRIBA APUNTANDO HACIA ABAJO --- */
     .flecha {
       position: relative;
       top: -10px;
       right: 0;
       margin: 0 auto;
-      transform: rotate(270deg);
-      border-left: 40px solid black;
-      border-top: 6px solid transparent;
-      border-bottom: 6px solid transparent;
+      transform: rotate(90deg);
+      border-left: none;
+      border-right: 40px solid black;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
     }
 
     .botones {
@@ -210,6 +212,10 @@
       padding: 10px 18px;
       font-size: 1em;
     }
+
+    .boton-instrucciones {
+      margin-top: 20px;
+    }
   }
 
   @media (max-width: 480px) {
@@ -218,25 +224,22 @@
       margin: 15px 5px;
     }
 
-    .texto-lateral p {
-      font-size: 0.9em;
-    }
-
-    .texto-lateral img {
-      width: 85%;
-    }
-
     #ruleta {
       width: 85vw;
       max-width: 320px;
     }
 
     .flecha {
-      border-left: 30px solid black;
       top: -15px;
+      border-right: 30px solid black;
     }
 
     .botones button {
+      padding: 8px 14px;
+      font-size: 0.9em;
+    }
+
+    .boton-instrucciones {
       padding: 8px 14px;
       font-size: 0.9em;
     }
@@ -248,21 +251,27 @@
   <h1>Especulaciones sobre posibles futuros de la crisis climática</h1>
 
   <div class="container">
+
+    <!-- Texto -->
     <div class="texto-lateral">
       <p><strong>Lector de emociones:</strong><br>Instrumento para identificar emociones.</p>
-      <img id="imgInstrucciones" src="Instrucciones.png" alt="Instrucciones">
+      <button class="boton-instrucciones" id="btnInstrucciones">Instrucciones</button>
     </div>
 
+    <!-- Ruleta -->
     <canvas id="ruleta" width="500" height="500"></canvas>
 
+    <!-- Flecha -->
     <div class="flecha"></div>
 
+    <!-- Botones -->
     <div class="botones">
       <button id="btnGirar">Girar</button>
       <button id="btnReiniciar">Reiniciar</button>
     </div>
   </div>
 
+  <!-- Modal -->
   <div id="modal" class="modal">
     <span id="cerrar" class="cerrar">&times;</span>
     <img id="imagenAmpliada" src="Instrucciones.png" alt="Instrucciones ampliadas">
@@ -312,11 +321,12 @@ document.getElementById('btnReiniciar').addEventListener('click', () => {
   drawRoulette();
 });
 
+/* --- MODAL INSTRUCCIONES --- */
 const modal = document.getElementById('modal');
-const imgInstrucciones = document.getElementById('imgInstrucciones');
+const btnInstrucciones = document.getElementById('btnInstrucciones');
 const cerrar = document.getElementById('cerrar');
 
-imgInstrucciones.addEventListener('click', () => {
+btnInstrucciones.addEventListener('click', () => {
   modal.style.display = 'flex';
 });
 
