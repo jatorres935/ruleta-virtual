@@ -74,16 +74,16 @@
 
   .botones {
     position: absolute;
-    right: 14%;
-    top: 50%;
+    right: 30%; 
+    top: 55%; 
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
   }
 
-  /* 🎚️ Slider tipo palanca */
+  /* Slider tipo palanca */
   .slider-container {
     display: flex;
     flex-direction: column;
@@ -116,7 +116,7 @@
     cursor: grabbing;
   }
 
-  /* ⚡ Barra de carga con brillo */
+  /* Barra de fuerza con palanca interna */
   .barra-fuerza {
     width: 20px;
     height: 100px;
@@ -137,8 +137,22 @@
     transition: height 0.2s linear;
   }
 
+  .palanca-movil {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) rotate(0deg);
+    width: 40px;
+    height: 40px;
+    background: url('palanca.png') center/contain no-repeat;
+    pointer-events: none;
+    transition: bottom 0.2s ease, transform 0.2s ease;
+  }
+
+  /* Brillo / pulsación */
   .brillo {
-    animation: pulse 0.8s infinite alternate;
+    animation: pulse 0.5s infinite alternate;
+    box-shadow: 0 0 20px 5px rgba(0,255,100,0.9);
   }
 
   @keyframes pulse {
@@ -146,7 +160,7 @@
     100% { box-shadow: 0 0 25px 5px rgba(0,255,100,0.8); }
   }
 
-  /* 🎉 Confeti */
+  /* Confeti */
   canvas#confeti {
     position: fixed;
     top: 0;
@@ -232,6 +246,7 @@
     <div class="slider-container">
       <div class="barra-fuerza" id="barraFuerza">
         <div class="nivel-fuerza" id="nivelFuerza"></div>
+        <div class="palanca-movil" id="palancaMovil"></div>
       </div>
       <input type="range" id="sliderFuerza" min="0" max="100" value="0">
     </div>
@@ -271,21 +286,34 @@ function animate() {
   if (!spinning) return;
   rotation += velocity;
   velocity *= 0.98;
+
+  // Hacer que la palanca tiemble durante el giro
+  if (velocity > 0.01) {
+    palancaMovil.style.transform = `translateX(-50%) rotate(${Math.sin(rotation*5)*10}deg)`;
+  }
+
   if (velocity < 0.002) {
     spinning = false;
+    palancaMovil.style.transform = `translateX(-50%) rotate(0deg)`;
     launchConfetti();
   }
+
   drawRoulette();
   requestAnimationFrame(animate);
 }
 
-/* ⚙️ Slider control */
+/* Slider control */
 const slider = document.getElementById('sliderFuerza');
 const nivelFuerza = document.getElementById('nivelFuerza');
+const palancaMovil = document.getElementById('palancaMovil');
 
 slider.addEventListener('input', () => {
   fuerza = parseInt(slider.value);
   nivelFuerza.style.height = fuerza + '%';
+
+  // Mover la palanca dentro de la barra
+  palancaMovil.style.bottom = fuerza + '%';
+  palancaMovil.style.transform = `translateX(-50%) rotate(${fuerza * 1.2}deg)`;
 
   if (fuerza >= 100) {
     nivelFuerza.classList.add('brillo');
@@ -299,11 +327,16 @@ slider.addEventListener('change', () => {
     spinning = true;
     velocity = (fuerza / 100) * 0.5;
     animate();
-    setTimeout(() => { slider.value = 0; nivelFuerza.style.height = '0%'; }, 800);
+    setTimeout(() => {
+      slider.value = 0;
+      nivelFuerza.style.height = '0%';
+      palancaMovil.style.bottom = '0%';
+      palancaMovil.style.transform = 'translateX(-50%) rotate(0deg)';
+    }, 800);
   }
 });
 
-/* 🎉 Confeti */
+/* Confeti */
 const confetiCanvas = document.getElementById('confeti');
 const cctx = confetiCanvas.getContext('2d');
 confetiCanvas.width = window.innerWidth;
@@ -317,25 +350,32 @@ window.addEventListener('resize', () => {
 function launchConfetti() {
   const particles = [];
   const colors = ['#ff0', '#0f0', '#f0f', '#0ff', '#f00', '#00f'];
-  for (let i = 0; i < 120; i++) {
+  for (let i = 0; i < 200; i++) {
     particles.push({
       x: Math.random() * confetiCanvas.width,
       y: Math.random() * confetiCanvas.height - confetiCanvas.height,
-      size: Math.random() * 6 + 4,
+      size: Math.random() * 8 + 4,
       color: colors[Math.floor(Math.random() * colors.length)],
-      speed: Math.random() * 3 + 2,
-      angle: Math.random() * 2 * Math.PI
+      speed: Math.random() * 4 + 2,
+      angle: Math.random() * 2 * Math.PI,
+      rotation: Math.random() * 360,
+      rotationSpeed: Math.random() * 0.2 - 0.1
     });
   }
 
-  let duration = 150;
+  let duration = 200;
   function drawConfetti() {
     cctx.clearRect(0, 0, confetiCanvas.width, confetiCanvas.height);
     particles.forEach(p => {
       p.y += p.speed;
       p.x += Math.sin(p.angle);
+      p.rotation += p.rotationSpeed;
+      cctx.save();
+      cctx.translate(p.x, p.y);
+      cctx.rotate(p.rotation);
       cctx.fillStyle = p.color;
-      cctx.fillRect(p.x, p.y, p.size, p.size);
+      cctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+      cctx.restore();
     });
     if (duration-- > 0) requestAnimationFrame(drawConfetti);
   }
