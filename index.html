@@ -10,7 +10,7 @@
     color: black;
     font-family: Arial, sans-serif;
     margin: 0;
-    overflow-x: hidden;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -20,27 +20,20 @@
     margin-top: 20px;
     font-size: 1.8em;
     text-align: center;
-    padding: 0 10px;
   }
 
   .container {
     position: relative;
     width: 100%;
-    height: auto;
-    min-height: 80vh;
+    height: 90vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap;
   }
 
   #ruleta {
     border-radius: 50%;
     cursor: pointer;
-    max-width: 90vw;
-    height: auto;
-    position: relative;
-    z-index: 5;
   }
 
   .flecha {
@@ -53,7 +46,7 @@
     border-bottom: 8px solid transparent;
     border-left: 70px solid black;
     transform: translateY(-50%) rotate(180deg);
-    z-index: 6;
+    z-index: 10;
   }
 
   .texto-lateral {
@@ -63,13 +56,23 @@
     width: 240px;
     text-align: left;
     transform: translateY(-50%);
-    z-index: 2;
   }
 
   .texto-lateral p {
     font-size: 1em;
     margin-bottom: 10px;
     line-height: 1.4;
+  }
+
+  .texto-lateral img {
+    width: 100%;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+
+  .texto-lateral img:hover {
+    transform: scale(1.03);
   }
 
   .botones {
@@ -95,22 +98,6 @@
 
   .botones button:hover {
     background-color: #0056b3;
-  }
-
-  .boton-instrucciones {
-    background-color: #28a745;
-    border: none;
-    color: white;
-    font-size: 1em;
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.3s;
-    margin-top: 15px;
-  }
-
-  .boton-instrucciones:hover {
-    background-color: #1e7e34;
   }
 
   .modal {
@@ -144,129 +131,21 @@
     font-weight: bold;
   }
 
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes zoomIn { from { transform: scale(0.8); } to { transform: scale(1); } }
-
-  /* 📱 --- VERSIÓN MÓVIL --- */
-  @media (max-width: 768px) {
-    .container {
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: auto;
-      padding-bottom: 10px;
-    }
-
-    .texto-lateral {
-      position: relative;
-      left: 0;
-      top: 0;
-      transform: none;
-      text-align: center;
-      margin-bottom: 12px;
-      width: 90%;
-    }
-
-    #ruleta {
-      width: 80vw;
-      max-width: 400px;
-      height: auto;
-    }
-
-    .flecha {
-      position: relative;
-      top: -10px;
-      right: 0;
-      margin: 0 auto;
-      transform: rotate(90deg);
-      border-left: none;
-      border-right: 40px solid black;
-      border-top: 8px solid transparent;
-      border-bottom: 8px solid transparent;
-      z-index: 6;
-    }
-
-    .botones {
-      position: relative;
-      top: 10px;
-      right: 0;
-      transform: none;
-      flex-direction: row;
-      gap: 12px;
-      justify-content: center;
-      width: 100%;
-    }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
-  /* 📲 --- MODO HORIZONTAL EN MÓVILES --- */
-  @media (max-width: 768px) and (orientation: landscape) {
-    body {
-      flex-direction: column;
-      align-items: center;
-    }
+  @keyframes zoomIn {
+    from { transform: scale(0.8); }
+    to { transform: scale(1); }
+  }
 
-    .container {
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      height: auto;
-      padding-top: 6px;
-      padding-bottom: 8px;
-    }
-
-    #ruleta {
-      order: 1;
-      width: 56vw;
-      max-width: 420px;
-      height: auto;
-      margin-top: 4px;
-      margin-bottom: 6px;
-    }
-
-    .flecha {
-      order: 0;
-      position: relative !important;
-      top: -6px;
-      right: 0 !important;
-      margin: 0 auto;
-      transform: rotate(90deg) !important;
-      border-left: none !important;
-      border-right: 42px solid black !important;
-      border-top: 8px solid transparent !important;
-      border-bottom: 8px solid transparent !important;
-      z-index: 6;
-    }
-
-    /* 🔹 AJUSTE NUEVO: subir texto y botón */
+  /* --- 📱 Ajuste solo para móviles en horizontal --- */
+  @media only screen and (max-width: 768px) and (orientation: landscape) {
     .texto-lateral {
-      order: 2;
-      position: relative !important;
-      left: 0 !important;
-      top: -20px !important; /* 🔺 Subido para evitar solapamiento */
-      transform: none !important;
-      text-align: center !important;
-      margin-top: 5px !important;
-      margin-bottom: 5px !important;
-      width: 90% !important;
-      font-size: 0.95em !important;
-      z-index: 2;
-    }
-
-    .boton-instrucciones {
-      margin-top: 8px !important; /* 🔺 Subido ligeramente */
-    }
-
-    .botones {
-      order: 3;
-      position: relative !important;
-      top: 6px;
-      right: 0 !important;
-      transform: none !important;
-      flex-direction: row;
-      gap: 12px;
-      justify-content: center;
-      width: 100%;
-      margin-bottom: 6px;
+      top: 30%; /* 🔹 Se sube el texto y el botón de instrucciones */
+      transform: translateY(-30%);
     }
   }
 </style>
@@ -278,7 +157,7 @@
   <div class="container">
     <div class="texto-lateral">
       <p><strong>Lector de emociones:</strong><br>Instrumento para identificar emociones.</p>
-      <button class="boton-instrucciones" id="btnInstrucciones">Instrucciones</button>
+      <img id="imgInstrucciones" src="Instrucciones.png" alt="Instrucciones">
     </div>
 
     <canvas id="ruleta" width="500" height="500"></canvas>
@@ -341,10 +220,10 @@ document.getElementById('btnReiniciar').addEventListener('click', () => {
 });
 
 const modal = document.getElementById('modal');
-const btnInstrucciones = document.getElementById('btnInstrucciones');
+const imgInstrucciones = document.getElementById('imgInstrucciones');
 const cerrar = document.getElementById('cerrar');
 
-btnInstrucciones.addEventListener('click', () => {
+imgInstrucciones.addEventListener('click', () => {
   modal.style.display = 'flex';
 });
 
