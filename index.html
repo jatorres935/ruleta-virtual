@@ -40,10 +40,9 @@
     max-width: 90vw;
     height: auto;
     position: relative;
-    z-index: 5; /* asegurar que la ruleta quede por encima si hay solapamiento */
+    z-index: 5;
   }
 
-  /* --- FLECHA --- */
   .flecha {
     position: absolute;
     right: 29%;
@@ -98,7 +97,6 @@
     background-color: #0056b3;
   }
 
-  /* --- NUEVO BOTÓN DE INSTRUCCIONES --- */
   .boton-instrucciones {
     background-color: #28a745;
     border: none;
@@ -115,7 +113,6 @@
     background-color: #1e7e34;
   }
 
-  /* --- MODAL --- */
   .modal {
     display: none;
     position: fixed;
@@ -147,17 +144,10 @@
     font-weight: bold;
   }
 
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes zoomIn { from { transform: scale(0.8); } to { transform: scale(1); } }
 
-  @keyframes zoomIn {
-    from { transform: scale(0.8); }
-    to { transform: scale(1); }
-  }
-
-  /* 📱 --- OPTIMIZACIÓN RESPONSIVA --- */
+  /* 📱 --- VERSIÓN MÓVIL --- */
   @media (max-width: 768px) {
     .container {
       flex-direction: column;
@@ -165,11 +155,6 @@
       justify-content: center;
       height: auto;
       padding-bottom: 10px;
-    }
-
-    h1 {
-      font-size: 1.5em;
-      margin: 10px;
     }
 
     .texto-lateral {
@@ -188,7 +173,6 @@
       height: auto;
     }
 
-    /* --- FLECHA ARRIBA APUNTANDO HACIA ABAJO --- */
     .flecha {
       position: relative;
       top: -10px;
@@ -212,21 +196,9 @@
       justify-content: center;
       width: 100%;
     }
-
-    .botones button {
-      padding: 10px 18px;
-      font-size: 1em;
-    }
-
-    .boton-instrucciones {
-      margin-top: 12px;
-    }
   }
 
-  /* 📲 --- CORRECCIÓN ESPECÍFICA PARA MODO HORIZONTAL EN MÓVILES ---
-     Asegura que el texto quede debajo y centrado, evita superposición.
-     Aquí uso overrides fuertes (position: relative !important) para neutralizar
-     la posición absoluta previa que provocaba el solapamiento. */
+  /* 📲 --- MODO HORIZONTAL EN MÓVILES --- */
   @media (max-width: 768px) and (orientation: landscape) {
     body {
       flex-direction: column;
@@ -242,7 +214,6 @@
       padding-bottom: 8px;
     }
 
-    /* Ruleta: un tamaño que asegura que haya espacio para texto debajo */
     #ruleta {
       order: 1;
       width: 56vw;
@@ -252,7 +223,6 @@
       margin-bottom: 6px;
     }
 
-    /* Flecha: arriba de la ruleta, centrada */
     .flecha {
       order: 0;
       position: relative !important;
@@ -267,24 +237,25 @@
       z-index: 6;
     }
 
-    /* Texto: pasar RELATIVO y debajo de la ruleta, centrado y con margen reducido */
+    /* 🔹 AJUSTE NUEVO: subir texto y botón */
     .texto-lateral {
       order: 2;
       position: relative !important;
       left: 0 !important;
-      top: 0 !important;
+      top: -20px !important; /* 🔺 Subido para evitar solapamiento */
       transform: none !important;
       text-align: center !important;
-      margin-top: 10px !important;
-      margin-bottom: 10px !important;
-      width: 92% !important;
+      margin-top: 5px !important;
+      margin-bottom: 5px !important;
+      width: 90% !important;
       font-size: 0.95em !important;
       z-index: 2;
-      background: transparent;
-      padding: 0 6px;
     }
 
-    /* Botones debajo del texto */
+    .boton-instrucciones {
+      margin-top: 8px !important; /* 🔺 Subido ligeramente */
+    }
+
     .botones {
       order: 3;
       position: relative !important;
@@ -297,39 +268,6 @@
       width: 100%;
       margin-bottom: 6px;
     }
-
-    /* Reducir un poco el padding para caber mejor sin scroll */
-    .botones button, .boton-instrucciones {
-      padding: 8px 12px;
-      font-size: 0.95em;
-    }
-  }
-
-  @media (max-width: 480px) {
-    h1 {
-      font-size: 1.2em;
-      margin: 15px 5px;
-    }
-
-    #ruleta {
-      width: 85vw;
-      max-width: 320px;
-    }
-
-    .flecha {
-      top: -15px;
-      border-right: 30px solid black;
-    }
-
-    .botones button {
-      padding: 8px 14px;
-      font-size: 0.9em;
-    }
-
-    .boton-instrucciones {
-      padding: 8px 14px;
-      font-size: 0.9em;
-    }
   }
 </style>
 </head>
@@ -338,27 +276,21 @@
   <h1>Especulaciones sobre posibles futuros de la crisis climática</h1>
 
   <div class="container">
-
-    <!-- Texto -->
     <div class="texto-lateral">
       <p><strong>Lector de emociones:</strong><br>Instrumento para identificar emociones.</p>
       <button class="boton-instrucciones" id="btnInstrucciones">Instrucciones</button>
     </div>
 
-    <!-- Ruleta -->
     <canvas id="ruleta" width="500" height="500"></canvas>
 
-    <!-- Flecha -->
     <div class="flecha"></div>
 
-    <!-- Botones -->
     <div class="botones">
       <button id="btnGirar">Girar</button>
       <button id="btnReiniciar">Reiniciar</button>
     </div>
   </div>
 
-  <!-- Modal -->
   <div id="modal" class="modal">
     <span id="cerrar" class="cerrar">&times;</span>
     <img id="imagenAmpliada" src="Instrucciones.png" alt="Instrucciones ampliadas">
@@ -408,7 +340,6 @@ document.getElementById('btnReiniciar').addEventListener('click', () => {
   drawRoulette();
 });
 
-/* --- MODAL INSTRUCCIONES --- */
 const modal = document.getElementById('modal');
 const btnInstrucciones = document.getElementById('btnInstrucciones');
 const cerrar = document.getElementById('cerrar');
