@@ -83,9 +83,26 @@
     gap: 15px;
   }
 
+  /* Imagen de la palanca */
+  .palanca-container {
+    position: relative;
+    width: 70px;
+    height: 150px;
+    cursor: pointer;
+  }
+
+  .palanca {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform-origin: bottom center;
+    transition: transform 0.3s ease;
+  }
+
   input[type="range"] {
     width: 160px;
     accent-color: #007bff;
+    display: none; /* ocultamos el slider real */
   }
 
   .boton-instrucciones {
@@ -212,9 +229,10 @@
     <div class="flecha"></div>
 
     <div class="botones">
-      <label for="fuerza">Fuerza de giro</label>
+      <div class="palanca-container" id="palancaContainer">
+        <img src="palanca.png" alt="Palanca" class="palanca" id="palanca">
+      </div>
       <input type="range" id="fuerza" min="10" max="100" value="50">
-      <button id="btnGirar">Girar</button>
     </div>
   </div>
 
@@ -254,17 +272,43 @@ function animate() {
 }
 
 const fuerzaSlider = document.getElementById('fuerza');
-const btnGirar = document.getElementById('btnGirar');
+const palanca = document.getElementById('palanca');
+const palancaContainer = document.getElementById('palancaContainer');
 
-btnGirar.addEventListener('click', () => {
+let fuerzaSeleccionada = 50;
+
+// 🎰 Simular palanca que se mueve y lanza la ruleta
+palancaContainer.addEventListener('mousedown', () => {
+  palanca.style.transform = 'rotate(20deg)';
+});
+palancaContainer.addEventListener('mouseup', () => {
+  palanca.style.transform = 'rotate(0deg)';
+  lanzarRuleta();
+});
+palancaContainer.addEventListener('touchstart', () => {
+  palanca.style.transform = 'rotate(20deg)';
+});
+palancaContainer.addEventListener('touchend', () => {
+  palanca.style.transform = 'rotate(0deg)';
+  lanzarRuleta();
+});
+
+function lanzarRuleta() {
   if (!spinning) {
     spinning = true;
-    const fuerza = parseInt(fuerzaSlider.value);
+    const fuerza = fuerzaSeleccionada;
     velocity = (fuerza / 100) * 0.5;
     animate();
   }
+}
+
+fuerzaSlider.addEventListener('input', (e) => {
+  fuerzaSeleccionada = e.target.value;
 });
 
+fuerzaSlider.addEventListener('change', lanzarRuleta);
+
+// --- Modal de instrucciones ---
 const modal = document.getElementById('modal');
 const btnInstrucciones = document.getElementById('btnInstrucciones');
 const cerrar = document.getElementById('cerrar');
@@ -272,17 +316,14 @@ const cerrar = document.getElementById('cerrar');
 btnInstrucciones.addEventListener('click', () => {
   modal.style.display = 'flex';
 });
-
 cerrar.addEventListener('click', () => {
   modal.style.display = 'none';
 });
-
 window.addEventListener('click', (e) => {
   if (e.target === modal) modal.style.display = 'none';
 });
 
-
-// 🎯 --- NUEVA FUNCIÓN: Girar la ruleta manualmente en móviles ---
+// 🎯 --- Girar la ruleta manualmente en móviles ---
 let lastTouchAngle = null;
 let touchVelocity = 0;
 
