@@ -74,31 +74,49 @@
 
   .botones {
     position: absolute;
-    right: 14%; /* 🔧 Más cerca de la ruleta */
+    right: 14%;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
   }
 
-  .palanca-container {
-    position: relative;
-    width: 70px;
-    height: 150px;
+  /* 🎚️ Slider tipo palanca */
+  .slider-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #sliderFuerza {
+    -webkit-appearance: none;
+    width: 150px;
+    height: 12px;
+    background: #ccc;
+    border-radius: 6px;
+    outline: none;
     cursor: pointer;
   }
 
-  .palanca {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transform-origin: bottom center;
-    transition: transform 0.3s ease;
+  #sliderFuerza::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 60px;
+    height: 60px;
+    background: url('palanca.png') center/contain no-repeat;
+    cursor: grab;
+    border-radius: 50%;
+    transition: transform 0.2s;
   }
 
-  /* 🔋 Barra de carga */
+  #sliderFuerza:active::-webkit-slider-thumb {
+    transform: scale(1.1);
+    cursor: grabbing;
+  }
+
+  /* ⚡ Barra de carga con brillo */
   .barra-fuerza {
     width: 20px;
     height: 100px;
@@ -107,7 +125,6 @@
     overflow: hidden;
     border: 2px solid #aaa;
     position: relative;
-    display: none;
   }
 
   .nivel-fuerza {
@@ -116,8 +133,26 @@
     left: 0;
     width: 100%;
     height: 0%;
-    background-color: #28a745;
-    transition: height 0.1s linear;
+    background: linear-gradient(180deg, #28a745, #00ff66);
+    transition: height 0.2s linear;
+  }
+
+  .brillo {
+    animation: pulse 0.8s infinite alternate;
+  }
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 10px 2px rgba(0,255,100,0.5); }
+    100% { box-shadow: 0 0 25px 5px rgba(0,255,100,0.8); }
+  }
+
+  /* 🎉 Confeti */
+  canvas#confeti {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 1000;
   }
 
   .boton-instrucciones {
@@ -170,93 +205,45 @@
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes zoomIn { from { transform: scale(0.8); } to { transform: scale(1); } }
 
-  /* 📱 --- VERSIÓN MÓVIL --- */
   @media (max-width: 768px) {
-    .container {
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: auto;
-      padding-bottom: 10px;
-    }
-
-    .texto-lateral {
-      position: relative;
-      left: 0;
-      top: 0;
-      transform: none;
-      text-align: center;
-      margin-bottom: 12px;
-      width: 90%;
-    }
-
-    #ruleta {
-      width: 80vw;
-      max-width: 400px;
-      height: auto;
-    }
-
-    .flecha {
-      position: relative;
-      top: -10px;
-      right: 0;
-      margin: 0 auto;
-      transform: rotate(90deg);
-      border-left: none;
-      border-right: 40px solid black;
-      border-top: 8px solid transparent;
-      border-bottom: 8px solid transparent;
-      z-index: 6;
-    }
-
-    .botones {
-      position: relative;
-      top: 10px;
-      right: 0;
-      transform: none;
-      flex-direction: column;
-      gap: 12px;
-      justify-content: center;
-      width: 100%;
-    }
-  }
-
-  /* 📲 --- MODO HORIZONTAL EN MÓVILES --- */
-  @media (max-width: 768px) and (orientation: landscape) {
-    .texto-lateral {
-      top: -10px !important;
-    }
+    .container { flex-direction: column; }
+    .texto-lateral { position: relative; left: 0; top: 0; transform: none; text-align: center; width: 90%; }
+    #ruleta { width: 80vw; max-width: 400px; }
+    .flecha { position: relative; top: -10px; transform: rotate(90deg); border-left: none; border-right: 40px solid black; }
+    .botones { position: relative; top: 10px; right: 0; transform: none; flex-direction: column; }
   }
 </style>
 </head>
 <body>
 
-  <h1>Especulaciones sobre posibles futuros de la crisis climática</h1>
+<h1>Especulaciones sobre posibles futuros de la crisis climática</h1>
 
-  <div class="container">
-    <div class="texto-lateral">
-      <p><strong>Lector de emociones:</strong><br>Instrumento para identificar emociones.</p>
-      <button class="boton-instrucciones" id="btnInstrucciones">Instrucciones</button>
-    </div>
+<div class="container">
+  <div class="texto-lateral">
+    <p><strong>Lector de emociones:</strong><br>Instrumento para identificar emociones.</p>
+    <button class="boton-instrucciones" id="btnInstrucciones">Instrucciones</button>
+  </div>
 
-    <canvas id="ruleta" width="500" height="500"></canvas>
+  <canvas id="ruleta" width="500" height="500"></canvas>
 
-    <div class="flecha"></div>
+  <div class="flecha"></div>
 
-    <div class="botones">
+  <div class="botones">
+    <div class="slider-container">
       <div class="barra-fuerza" id="barraFuerza">
         <div class="nivel-fuerza" id="nivelFuerza"></div>
       </div>
-      <div class="palanca-container" id="palancaContainer">
-        <img src="palanca.png" alt="Palanca" class="palanca" id="palanca">
-      </div>
+      <input type="range" id="sliderFuerza" min="0" max="100" value="0">
     </div>
   </div>
+</div>
 
-  <div id="modal" class="modal">
-    <span id="cerrar" class="cerrar">&times;</span>
-    <img id="imagenAmpliada" src="Instrucciones.png" alt="Instrucciones ampliadas">
-  </div>
+<div id="modal" class="modal">
+  <span id="cerrar" class="cerrar">&times;</span>
+  <img id="imagenAmpliada" src="Instrucciones.png" alt="Instrucciones ampliadas">
+</div>
+
+<canvas id="confeti"></canvas>
 
 <script>
 const canvas = document.getElementById('ruleta');
@@ -267,6 +254,7 @@ img.src = 'ruleta.png';
 let rotation = 0;
 let spinning = false;
 let velocity = 0;
+let fuerza = 0;
 
 img.onload = () => drawRoulette();
 
@@ -283,101 +271,82 @@ function animate() {
   if (!spinning) return;
   rotation += velocity;
   velocity *= 0.98;
-  if (velocity < 0.002) spinning = false;
+  if (velocity < 0.002) {
+    spinning = false;
+    launchConfetti();
+  }
   drawRoulette();
   requestAnimationFrame(animate);
 }
 
-// 🎰 PALANCA Y BARRA DE FUERZA
-const palanca = document.getElementById('palanca');
-const barraFuerza = document.getElementById('barraFuerza');
+/* ⚙️ Slider control */
+const slider = document.getElementById('sliderFuerza');
 const nivelFuerza = document.getElementById('nivelFuerza');
-let fuerza = 0;
-let cargando = false;
-let intervaloCarga;
 
-function iniciarCarga() {
-  cargando = true;
-  barraFuerza.style.display = 'block';
-  nivelFuerza.style.height = '0%';
-  fuerza = 0;
+slider.addEventListener('input', () => {
+  fuerza = parseInt(slider.value);
+  nivelFuerza.style.height = fuerza + '%';
 
-  intervaloCarga = setInterval(() => {
-    if (fuerza < 100) {
-      fuerza += 2;
-      nivelFuerza.style.height = fuerza + '%';
-    }
-  }, 50);
-
-  palanca.style.transform = 'rotate(20deg)';
-}
-
-function soltarPalanca() {
-  if (!cargando) return;
-  clearInterval(intervaloCarga);
-  cargando = false;
-  palanca.style.transform = 'rotate(0deg)';
-  barraFuerza.style.display = 'none';
-
-  lanzarRuleta(fuerza);
-}
-
-function lanzarRuleta(f) {
-  if (!spinning) {
-    spinning = true;
-    velocity = (f / 100) * 0.5;
-    animate();
+  if (fuerza >= 100) {
+    nivelFuerza.classList.add('brillo');
+  } else {
+    nivelFuerza.classList.remove('brillo');
   }
+});
+
+slider.addEventListener('change', () => {
+  if (!spinning && fuerza > 0) {
+    spinning = true;
+    velocity = (fuerza / 100) * 0.5;
+    animate();
+    setTimeout(() => { slider.value = 0; nivelFuerza.style.height = '0%'; }, 800);
+  }
+});
+
+/* 🎉 Confeti */
+const confetiCanvas = document.getElementById('confeti');
+const cctx = confetiCanvas.getContext('2d');
+confetiCanvas.width = window.innerWidth;
+confetiCanvas.height = window.innerHeight;
+
+window.addEventListener('resize', () => {
+  confetiCanvas.width = window.innerWidth;
+  confetiCanvas.height = window.innerHeight;
+});
+
+function launchConfetti() {
+  const particles = [];
+  const colors = ['#ff0', '#0f0', '#f0f', '#0ff', '#f00', '#00f'];
+  for (let i = 0; i < 120; i++) {
+    particles.push({
+      x: Math.random() * confetiCanvas.width,
+      y: Math.random() * confetiCanvas.height - confetiCanvas.height,
+      size: Math.random() * 6 + 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      speed: Math.random() * 3 + 2,
+      angle: Math.random() * 2 * Math.PI
+    });
+  }
+
+  let duration = 150;
+  function drawConfetti() {
+    cctx.clearRect(0, 0, confetiCanvas.width, confetiCanvas.height);
+    particles.forEach(p => {
+      p.y += p.speed;
+      p.x += Math.sin(p.angle);
+      cctx.fillStyle = p.color;
+      cctx.fillRect(p.x, p.y, p.size, p.size);
+    });
+    if (duration-- > 0) requestAnimationFrame(drawConfetti);
+  }
+  drawConfetti();
 }
 
-palanca.addEventListener('mousedown', iniciarCarga);
-palanca.addEventListener('mouseup', soltarPalanca);
-palanca.addEventListener('touchstart', iniciarCarga);
-palanca.addEventListener('touchend', soltarPalanca);
-
-// 🎯 Modal instrucciones
+/* Modal */
 const modal = document.getElementById('modal');
 document.getElementById('btnInstrucciones').onclick = () => modal.style.display = 'flex';
 document.getElementById('cerrar').onclick = () => modal.style.display = 'none';
 window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
-
-// 🎯 Girar manualmente en móvil
-let lastTouchAngle = null;
-let touchVelocity = 0;
-
-canvas.addEventListener('touchstart', (e) => {
-  if (e.touches.length === 1) {
-    spinning = false;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.touches[0].clientX - rect.left - canvas.width / 2;
-    const y = e.touches[0].clientY - rect.top - canvas.height / 2;
-    lastTouchAngle = Math.atan2(y, x);
-  }
-});
-
-canvas.addEventListener('touchmove', (e) => {
-  if (e.touches.length === 1 && lastTouchAngle !== null) {
-    const rect = canvas.getBoundingClientRect();
-    const x = e.touches[0].clientX - rect.left - canvas.width / 2;
-    const y = e.touches[0].clientY - rect.top - canvas.height / 2;
-    const angle = Math.atan2(y, x);
-    const delta = angle - lastTouchAngle;
-    rotation += delta;
-    touchVelocity = delta;
-    drawRoulette();
-    lastTouchAngle = angle;
-  }
-});
-
-canvas.addEventListener('touchend', () => {
-  if (Math.abs(touchVelocity) > 0.001) {
-    spinning = true;
-    velocity = touchVelocity * 20;
-    animate();
-  }
-  lastTouchAngle = null;
-});
 </script>
-
 </body>
 </html>
