@@ -39,6 +39,8 @@
     cursor: pointer;
     max-width: 90vw;
     height: auto;
+    position: relative;
+    z-index: 5; /* asegurar que la ruleta quede por encima si hay solapamiento */
   }
 
   /* --- FLECHA --- */
@@ -52,7 +54,7 @@
     border-bottom: 8px solid transparent;
     border-left: 70px solid black;
     transform: translateY(-50%) rotate(180deg);
-    z-index: 10;
+    z-index: 6;
   }
 
   .texto-lateral {
@@ -62,6 +64,7 @@
     width: 240px;
     text-align: left;
     transform: translateY(-50%);
+    z-index: 2;
   }
 
   .texto-lateral p {
@@ -161,6 +164,7 @@
       align-items: center;
       justify-content: center;
       height: auto;
+      padding-bottom: 10px;
     }
 
     h1 {
@@ -174,7 +178,7 @@
       top: 0;
       transform: none;
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
       width: 90%;
     }
 
@@ -195,6 +199,7 @@
       border-right: 40px solid black;
       border-top: 8px solid transparent;
       border-bottom: 8px solid transparent;
+      z-index: 6;
     }
 
     .botones {
@@ -203,7 +208,7 @@
       right: 0;
       transform: none;
       flex-direction: row;
-      gap: 15px;
+      gap: 12px;
       justify-content: center;
       width: 100%;
     }
@@ -214,11 +219,14 @@
     }
 
     .boton-instrucciones {
-      margin-top: 20px;
+      margin-top: 12px;
     }
   }
 
-  /* 📲 --- CORREGIDO: EVITA SOBREPOSICIÓN EN MODO HORIZONTAL --- */
+  /* 📲 --- CORRECCIÓN ESPECÍFICA PARA MODO HORIZONTAL EN MÓVILES ---
+     Asegura que el texto quede debajo y centrado, evita superposición.
+     Aquí uso overrides fuertes (position: relative !important) para neutralizar
+     la posición absoluta previa que provocaba el solapamiento. */
   @media (max-width: 768px) and (orientation: landscape) {
     body {
       flex-direction: column;
@@ -230,52 +238,70 @@
       align-items: center;
       justify-content: flex-start;
       height: auto;
+      padding-top: 6px;
+      padding-bottom: 8px;
     }
 
+    /* Ruleta: un tamaño que asegura que haya espacio para texto debajo */
     #ruleta {
       order: 1;
-      width: 55vw;
-      max-width: 400px;
+      width: 56vw;
+      max-width: 420px;
       height: auto;
+      margin-top: 4px;
+      margin-bottom: 6px;
     }
 
+    /* Flecha: arriba de la ruleta, centrada */
     .flecha {
       order: 0;
-      position: relative;
-      top: -10px;
-      right: 0;
+      position: relative !important;
+      top: -6px;
+      right: 0 !important;
       margin: 0 auto;
-      transform: rotate(90deg);
-      border-left: none;
-      border-right: 40px solid black;
-      border-top: 8px solid transparent;
-      border-bottom: 8px solid transparent;
+      transform: rotate(90deg) !important;
+      border-left: none !important;
+      border-right: 42px solid black !important;
+      border-top: 8px solid transparent !important;
+      border-bottom: 8px solid transparent !important;
+      z-index: 6;
     }
 
-    /* 🔹 TEXTO DEBAJO DE LA RULETA */
+    /* Texto: pasar RELATIVO y debajo de la ruleta, centrado y con margen reducido */
     .texto-lateral {
       order: 2;
-      position: relative;
-      top: 0;
-      left: 0;
-      transform: none;
-      text-align: center;
-      margin-top: 20px;
-      margin-bottom: 10px;
-      width: 90%;
-      font-size: 0.9em;
+      position: relative !important;
+      left: 0 !important;
+      top: 0 !important;
+      transform: none !important;
+      text-align: center !important;
+      margin-top: 10px !important;
+      margin-bottom: 10px !important;
+      width: 92% !important;
+      font-size: 0.95em !important;
+      z-index: 2;
+      background: transparent;
+      padding: 0 6px;
     }
 
+    /* Botones debajo del texto */
     .botones {
       order: 3;
-      position: relative;
-      top: 10px;
-      right: 0;
-      transform: none;
+      position: relative !important;
+      top: 6px;
+      right: 0 !important;
+      transform: none !important;
       flex-direction: row;
-      gap: 15px;
+      gap: 12px;
       justify-content: center;
       width: 100%;
+      margin-bottom: 6px;
+    }
+
+    /* Reducir un poco el padding para caber mejor sin scroll */
+    .botones button, .boton-instrucciones {
+      padding: 8px 12px;
+      font-size: 0.95em;
     }
   }
 
