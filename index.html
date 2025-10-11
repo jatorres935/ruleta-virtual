@@ -74,7 +74,7 @@
 
   .botones {
     position: absolute;
-    right: 5%;
+    right: 14%; /* 🔧 Más cerca de la ruleta */
     top: 50%;
     transform: translateY(-50%);
     display: flex;
@@ -83,7 +83,6 @@
     gap: 15px;
   }
 
-  /* Imagen de la palanca */
   .palanca-container {
     position: relative;
     width: 70px;
@@ -99,10 +98,26 @@
     transition: transform 0.3s ease;
   }
 
-  input[type="range"] {
-    width: 160px;
-    accent-color: #007bff;
-    display: none; /* ocultamos el slider real */
+  /* 🔋 Barra de carga */
+  .barra-fuerza {
+    width: 20px;
+    height: 100px;
+    background-color: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #aaa;
+    position: relative;
+    display: none;
+  }
+
+  .nivel-fuerza {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0%;
+    background-color: #28a745;
+    transition: height 0.1s linear;
   }
 
   .boton-instrucciones {
@@ -229,10 +244,12 @@
     <div class="flecha"></div>
 
     <div class="botones">
+      <div class="barra-fuerza" id="barraFuerza">
+        <div class="nivel-fuerza" id="nivelFuerza"></div>
+      </div>
       <div class="palanca-container" id="palancaContainer">
         <img src="palanca.png" alt="Palanca" class="palanca" id="palanca">
       </div>
-      <input type="range" id="fuerza" min="10" max="100" value="50">
     </div>
   </div>
 
@@ -271,79 +288,78 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
-const fuerzaSlider = document.getElementById('fuerza');
+// 🎰 PALANCA Y BARRA DE FUERZA
 const palanca = document.getElementById('palanca');
-const palancaContainer = document.getElementById('palancaContainer');
+const barraFuerza = document.getElementById('barraFuerza');
+const nivelFuerza = document.getElementById('nivelFuerza');
+let fuerza = 0;
+let cargando = false;
+let intervaloCarga;
 
-let fuerzaSeleccionada = 50;
+function iniciarCarga() {
+  cargando = true;
+  barraFuerza.style.display = 'block';
+  nivelFuerza.style.height = '0%';
+  fuerza = 0;
 
-// 🎰 Simular palanca que se mueve y lanza la ruleta
-palancaContainer.addEventListener('mousedown', () => {
+  intervaloCarga = setInterval(() => {
+    if (fuerza < 100) {
+      fuerza += 2;
+      nivelFuerza.style.height = fuerza + '%';
+    }
+  }, 50);
+
   palanca.style.transform = 'rotate(20deg)';
-});
-palancaContainer.addEventListener('mouseup', () => {
-  palanca.style.transform = 'rotate(0deg)';
-  lanzarRuleta();
-});
-palancaContainer.addEventListener('touchstart', () => {
-  palanca.style.transform = 'rotate(20deg)';
-});
-palancaContainer.addEventListener('touchend', () => {
-  palanca.style.transform = 'rotate(0deg)';
-  lanzarRuleta();
-});
+}
 
-function lanzarRuleta() {
+function soltarPalanca() {
+  if (!cargando) return;
+  clearInterval(intervaloCarga);
+  cargando = false;
+  palanca.style.transform = 'rotate(0deg)';
+  barraFuerza.style.display = 'none';
+
+  lanzarRuleta(fuerza);
+}
+
+function lanzarRuleta(f) {
   if (!spinning) {
     spinning = true;
-    const fuerza = fuerzaSeleccionada;
-    velocity = (fuerza / 100) * 0.5;
+    velocity = (f / 100) * 0.5;
     animate();
   }
 }
 
-fuerzaSlider.addEventListener('input', (e) => {
-  fuerzaSeleccionada = e.target.value;
-});
+palanca.addEventListener('mousedown', iniciarCarga);
+palanca.addEventListener('mouseup', soltarPalanca);
+palanca.addEventListener('touchstart', iniciarCarga);
+palanca.addEventListener('touchend', soltarPalanca);
 
-fuerzaSlider.addEventListener('change', lanzarRuleta);
-
-// --- Modal de instrucciones ---
+// 🎯 Modal instrucciones
 const modal = document.getElementById('modal');
-const btnInstrucciones = document.getElementById('btnInstrucciones');
-const cerrar = document.getElementById('cerrar');
+document.getElementById('btnInstrucciones').onclick = () => modal.style.display = 'flex';
+document.getElementById('cerrar').onclick = () => modal.style.display = 'none';
+window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
 
-btnInstrucciones.addEventListener('click', () => {
-  modal.style.display = 'flex';
-});
-cerrar.addEventListener('click', () => {
-  modal.style.display = 'none';
-});
-window.addEventListener('click', (e) => {
-  if (e.target === modal) modal.style.display = 'none';
-});
-
-// 🎯 --- Girar la ruleta manualmente en móviles ---
+// 🎯 Girar manualmente en móvil
 let lastTouchAngle = null;
 let touchVelocity = 0;
 
 canvas.addEventListener('touchstart', (e) => {
   if (e.touches.length === 1) {
     spinning = false;
-    const touch = e.touches[0];
     const rect = canvas.getBoundingClientRect();
-    const x = touch.clientX - rect.left - canvas.width / 2;
-    const y = touch.clientY - rect.top - canvas.height / 2;
+    const x = e.touches[0].clientX - rect.left - canvas.width / 2;
+    const y = e.touches[0].clientY - rect.top - canvas.height / 2;
     lastTouchAngle = Math.atan2(y, x);
   }
 });
 
 canvas.addEventListener('touchmove', (e) => {
   if (e.touches.length === 1 && lastTouchAngle !== null) {
-    const touch = e.touches[0];
     const rect = canvas.getBoundingClientRect();
-    const x = touch.clientX - rect.left - canvas.width / 2;
-    const y = touch.clientY - rect.top - canvas.height / 2;
+    const x = e.touches[0].clientX - rect.left - canvas.width / 2;
+    const y = e.touches[0].clientY - rect.top - canvas.height / 2;
     const angle = Math.atan2(y, x);
     const delta = angle - lastTouchAngle;
     rotation += delta;
