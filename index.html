@@ -218,21 +218,64 @@
     }
   }
 
-  /* 📲 --- PREVENIR SOBREPOSICIÓN EN MODO HORIZONTAL --- */
+  /* 📲 --- CORREGIDO: EVITA SOBREPOSICIÓN EN MODO HORIZONTAL --- */
   @media (max-width: 768px) and (orientation: landscape) {
+    body {
+      flex-direction: column;
+      align-items: center;
+    }
+
     .container {
       flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: auto;
     }
-    .texto-lateral {
-      order: 2;
-      margin-top: 15px;
-    }
+
     #ruleta {
       order: 1;
-      width: 60vw;
+      width: 55vw;
+      max-width: 400px;
+      height: auto;
     }
+
     .flecha {
       order: 0;
+      position: relative;
+      top: -10px;
+      right: 0;
+      margin: 0 auto;
+      transform: rotate(90deg);
+      border-left: none;
+      border-right: 40px solid black;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+    }
+
+    /* 🔹 TEXTO DEBAJO DE LA RULETA */
+    .texto-lateral {
+      order: 2;
+      position: relative;
+      top: 0;
+      left: 0;
+      transform: none;
+      text-align: center;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      width: 90%;
+      font-size: 0.9em;
+    }
+
+    .botones {
+      order: 3;
+      position: relative;
+      top: 10px;
+      right: 0;
+      transform: none;
+      flex-direction: row;
+      gap: 15px;
+      justify-content: center;
+      width: 100%;
     }
   }
 
@@ -273,7 +316,6 @@
     <!-- Texto -->
     <div class="texto-lateral">
       <p><strong>Lector de emociones:</strong><br>Instrumento para identificar emociones.</p>
-      <!-- BOTÓN DE INSTRUCCIONES TAMBIÉN EN PC Y TABLETA -->
       <button class="boton-instrucciones" id="btnInstrucciones">Instrucciones</button>
     </div>
 
