@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Ruleta interactiva</title>
+<style>
+  :root{--size:800px}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;margin:0;
+       display:flex;align-items:center;justify-content:center;height:100vh;background:#fafafa}
+  .container{width:var(--size);max-width:96vw; text-align:center}
+  canvas{display:block;margin:0 auto;background:transparent;border-radius:50%}
+  #controls{margin-top:12px;display:flex;gap:10px;justify-content:center;align-items:center}
+  button{padding:10px 18px;border-radius:8px;border:0;background:#0d6efd;color:white;font-weight:600;cursor:pointer}
+  button:active{transform:scale(.98)}
+  #result{margin-top:10px;font-size:18px;font-weight:700;color:#222}
+  /* puntero (visual) */
+  .pointer{
+    position:relative;
+    width:var(--size);
+    height:0;
+    margin-top:-calc(var(--size) + 12px);
+    pointer-events:none;
+  }
+  .triangle{
+    width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;
+    border-bottom:36px solid #111;margin:0 auto;border-radius:2px;filter:drop-shadow(0 2px 2px rgba(0,0,0,0.35));
+  }
+  /* indicador circular en el centro (opcional) */
+  .center-dot{
+    position:relative;margin-top:-calc(var(--size) / 2 + 18px);
+    display:flex;justify-content:center;align-items:center;
+  }
+  .center-dot .dot{width:44px;height:44px;background:#fff;border-radius:50%;border:8px solid #111;box-sizing:border-box;margin:0 auto}
+  /* responsivo */
+  @media(max-width:420px){
+    :root{--size:360px}
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div style="position:relative">
+      <canvas id="ruleta" width="800" height="800" aria-label="Ruleta"></canvas>
+
+      <!-- puntero visible en la parte superior -->
+      <div class="pointer" aria-hidden="true">
+        <div class="triangle"></div>
+      </div>
+
+      <!-- punto central -->
+      <div class="center-dot" aria-hidden="true">
+        <div class="dot"></div>
+      </div>
+    </div>
+
+    <div id="controls">
+      <button id="spinBtn">GIRAR</button>
+      <button id="resetBtn" style="background:#6c757d">REINICIAR</button>
+    </div>
+
+    <div id="result" role="status" aria-live="polite"></div>
+    <div style="font-size:12px;margin-top:8px;color:#666">Nota: completa el array <code>labels</code> en el código con los textos exactos de tu ruleta si quieres que muestre el texto del sector.</div>
+  </div>
+
+<script>
+/*
+  Ruleta HTML/Canvas:
+  - Usa tu imagen `ruleta.png` en la misma carpeta.
+  - Ajusta `SECTORS` si tu ruleta tiene distinto número de sectores.
+  - Rellenar el array labels[] con los textos reales (orden desde sector superior y en sentido horario).
+*/
+
+const canvas = document.getElementById('ruleta');
+const ctx = canvas.getContext('2d', { alpha: true });
+const W = canvas.width;
+const H = canvas.height;
+const centerX = W/2;
+const centerY = H/2;
+
+const SECTORS = 12; // <<--- si tu ruleta tiene otro número, cámbialo aquí (12 es el valor por defecto acordado)
+const sectorAngle = 2 * Math.PI / SECTORS;
+
+// Rellena estos labels en el orden que corresponde a tu ruleta:
+// El primer label debe corresponder al sector que aparece apuntando al "puntero" cuando la rueda está en su orientación original (rot 0).
+// Si no conoces el orden exacto, deja los textos genéricos y verás "Sector N".
+const labels = [
+  "Goce, placer",
+  "Sufrimiento de otra criatura",
+  "Sector 3",
+  "Sector 4",
+  "Sector 5",
+  "Sector 6",
+  "Sector 7",
+  "Sector 8",
+  "Sector 9",
+  "Sector 10",
+  "Sector 11",
+  "Sector 12"
+];
+
+// Imagen (usa la tuya renombrada a 'ruleta.png'):
+const img = new Image();
+img.src = 'ruleta.png'; // <- asegúrate que el archivo ruleta.png esté en la misma carpeta que este HTML
+
+let rotation = 0;   // rotación actual (radianes)
+let spinning = false;
+let animationId = null;
+
+// dibuja la imagen centrada, la rotamos por 'rotation'
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.save();
+  ctx.translate(centerX, centerY);
+  ctx.rotate(rotation);
+  // dibuja la imagen centrada en el canvas
+  // ajusta tamaño para ocupar el canvas (suponemos la imagen es cuadrada)
+  ctx.drawImage(img, -W/2, -H/2, W, H);
+  ctx.restore();
+
+  // opcional: dibujar contorno circular (no necesario si la imagen ya lo tiene)
+  // ctx.beginPath(); ctx.arc(centerX, centerY, W/2 - 1, 0, 2*Math.PI); ctx.strokeStyle = 'rgba(0,0,0,0.12)'; ctx.lineWidth=2; ctx.stroke();
+}
+
+// función que inicia el giro con física simple (ease out)
+function spin(){
+  if(spinning) return;
+  spinning = true;
+  document.getElementById('result').textContent = '';
+
+  // Elegimos un giro aleatorio:
+  // vueltas entre 5 y 9 vueltas -> en radianes:
+  const minRevs = 5;
+  const maxRevs = 9;
+  const revs = Math.random() * (maxRevs - minRevs) + minRevs;
+  // además añadimos un offset aleatorio dentro de 0..2PI para no detenerse exactamente en un borde
+  const offset = Math.random() * 2 * Math.PI;
+
+  // Objetivo absoluto de rotación:
+  const target = rotation + revs * 2 * Math.PI + offset;
+
+  // animación con requestAnimationFrame:
+  const duration = 4200 + Math.random()*1800; // ms (4.2s a 6s)
+  const start = performance.now();
+  const startRot = rotation;
+
+  function animate(now){
+    const t = Math.min(1, (now - start) / duration);
+    // easeOutCubic:
+    const ease = 1 - Math.pow(1 - t, 3);
+    rotation = startRot + (target - startRot) * ease;
+    draw();
+
+    if(t < 1){
+      animationId = requestAnimationFrame(animate);
+    } else {
+      spinning = false;
+      // normalizamos la rotación a [0, 2PI)
+      rotation = rotation % (2 * Math.PI);
+      if(rotation < 0) rotation += 2*Math.PI;
+      draw();
+      announceResult();
+    }
+  }
+  animationId = requestAnimationFrame(animate);
+}
+
+// Determina el sector bajo el puntero (puntero arriba).
+function announceResult(){
+  // recordemos: la rueda gira; el puntero está en la posición superior.
+  // Calculamos el ángulo relativo al tope (arriba) y convertimos a índice de sector.
+  // Si rotación=0 la imagen está en su orientación original.
+  // Debemos encontrar qué sector queda en la posición 'top' (ángulo -PI/2 en coordenadas tradicionales),
+  // pero hemos dibujado rotando el imagen completa, así usamos la siguiente fórmula para que el índice vaya en sentido horario.
+  const normalized = rotation % (2*Math.PI);
+  const angleFromTop = (2*Math.PI - normalized + 0) % (2*Math.PI);
+  const idx = Math.floor(angleFromTop / sectorAngle) % SECTORS;
+
+  // obtenemos label si está definido:
+  const label = labels[idx] || ("Sector " + (idx+1));
+  const out = `Resultado: ${label}`;
+  document.getElementById('result').textContent = out;
+
+  // efecto visual breve: destello del sector (opcional)
+  flashSector(idx);
+}
+
+// dibuja un ligero destello sobre el sector ganador (no modifica la imagen original)
+function flashSector(idx){
+  // calculamos ángulo medio del sector:
+  const startAngle = -idx * sectorAngle;
+  const mid = startAngle - sectorAngle/2;
+
+  // animación de overlay con fade:
+  const start = performance.now();
+  const dur = 900;
+  function anim(now){
+    const t = (now - start)/dur;
+    if(t>1) { draw(); return; } // redraw final
+    // semitransparente radial overlay
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    // overlay sector
+    ctx.beginPath();
+    // mapa: sector range relative a rotation
+    const a0 = -mid - sectorAngle/2 - rotation;
+    const a1 = -mid + sectorAngle/2 - rotation;
+    // convert to canvas angles (canvas 0 is at +x). We'll simply draw an arc overlay by using full circle overlay with globalCompositeOperation
+    ctx.restore();
+    draw();
+    requestAnimationFrame(anim);
+  }
+  requestAnimationFrame(anim);
+}
+
+// reiniciar
+function reset(){
+  if(animationId) cancelAnimationFrame(animationId);
+  spinning = false;
+  rotation = 0;
+  draw();
+  document.getElementById('result').textContent = '';
+}
+
+document.getElementById('spinBtn').addEventListener('click', spin);
+document.getElementById('resetBtn').addEventListener('click', reset);
+
+// cargar imagen y dibujar al terminar
+img.onload = function(){
+  // si tu imagen NO es cuadrada, la estiramos a cuadrado para que quede centrada; 
+  // mejor si subes una imagen cuadrada recortada previamente.
+  draw();
+};
+img.onerror = function(){
+  document.getElementById('result').textContent = "Error cargando ruleta.png — asegúrate que el archivo esté en la misma carpeta que el HTML y que se llame 'ruleta.png'.";
+};
+</script>
+</body>
+</html>
