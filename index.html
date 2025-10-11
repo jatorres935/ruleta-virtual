@@ -79,22 +79,13 @@
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 15px;
   }
 
-  .botones button {
-    background-color: #007bff;
-    border: none;
-    color: white;
-    font-size: 1em;
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-
-  .botones button:hover {
-    background-color: #0056b3;
+  input[type="range"] {
+    width: 160px;
+    accent-color: #007bff;
   }
 
   .boton-instrucciones {
@@ -191,7 +182,7 @@
       top: 10px;
       right: 0;
       transform: none;
-      flex-direction: row;
+      flex-direction: column;
       gap: 12px;
       justify-content: center;
       width: 100%;
@@ -200,72 +191,8 @@
 
   /* 📲 --- MODO HORIZONTAL EN MÓVILES --- */
   @media (max-width: 768px) and (orientation: landscape) {
-    body {
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .container {
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      height: auto;
-      padding-top: 6px;
-      padding-bottom: 8px;
-    }
-
-    #ruleta {
-      order: 1;
-      width: 56vw;
-      max-width: 420px;
-      height: auto;
-      margin-top: 4px;
-      margin-bottom: 6px;
-    }
-
-    .flecha {
-      order: 0;
-      position: relative !important;
-      top: -6px;
-      right: 0 !important;
-      margin: 0 auto;
-      transform: rotate(90deg) !important;
-      border-left: none !important;
-      border-right: 42px solid black !important;
-      border-top: 8px solid transparent !important;
-      border-bottom: 8px solid transparent !important;
-      z-index: 6;
-    }
-
     .texto-lateral {
-      order: 2;
-      position: relative !important;
-      left: 0 !important;
-      top: -20px !important;
-      transform: none !important;
-      text-align: center !important;
-      margin-top: 5px !important;
-      margin-bottom: 5px !important;
-      width: 90% !important;
-      font-size: 0.95em !important;
-      z-index: 2;
-    }
-
-    .boton-instrucciones {
-      margin-top: 8px !important;
-    }
-
-    .botones {
-      order: 3;
-      position: relative !important;
-      top: 6px;
-      right: 0 !important;
-      transform: none !important;
-      flex-direction: row;
-      gap: 12px;
-      justify-content: center;
-      width: 100%;
-      margin-bottom: 6px;
+      top: -10px !important;
     }
   }
 </style>
@@ -285,8 +212,9 @@
     <div class="flecha"></div>
 
     <div class="botones">
+      <label for="fuerza">Fuerza de giro</label>
+      <input type="range" id="fuerza" min="10" max="100" value="50">
       <button id="btnGirar">Girar</button>
-      <button id="btnReiniciar">Reiniciar</button>
     </div>
   </div>
 
@@ -325,18 +253,16 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
-document.getElementById('btnGirar').addEventListener('click', () => {
+const fuerzaSlider = document.getElementById('fuerza');
+const btnGirar = document.getElementById('btnGirar');
+
+btnGirar.addEventListener('click', () => {
   if (!spinning) {
     spinning = true;
-    velocity = Math.random() * 0.3 + 0.25;
+    const fuerza = parseInt(fuerzaSlider.value);
+    velocity = (fuerza / 100) * 0.5;
     animate();
   }
-});
-
-document.getElementById('btnReiniciar').addEventListener('click', () => {
-  spinning = false;
-  rotation = 0;
-  drawRoulette();
 });
 
 const modal = document.getElementById('modal');
@@ -357,8 +283,6 @@ window.addEventListener('click', (e) => {
 
 
 // 🎯 --- NUEVA FUNCIÓN: Girar la ruleta manualmente en móviles ---
-let startAngle = 0;
-let currentAngle = 0;
 let lastTouchAngle = null;
 let touchVelocity = 0;
 
