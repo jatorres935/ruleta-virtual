@@ -40,7 +40,7 @@ h1 {
   height: auto;
   position: relative;
   z-index: 1;
-  touch-action: none; /* importante para control táctil */
+  touch-action: none;
 }
 
 .flecha {
@@ -153,8 +153,22 @@ h1 {
   .container{flex-direction:column;}
   .texto-lateral{position:relative;left:0;top:0;transform:none;text-align:center;width:90%;}
   #ruleta{width:90vw;max-width:400px;}
-  .flecha{position:relative;top:-10px;transform:rotate(90deg);border-left:none;border-right:40px solid black;}
-  .boton-girar { position: relative; top: 10px; right: 0; transform: none; }
+  .flecha{
+    position: relative;
+    top: -5px;
+    right: 0;
+    transform: rotate(90deg);
+    border-left: none;
+    border-right: 40px solid black;
+    margin-bottom: 10px;
+  }
+  .boton-girar{
+    position: relative;
+    top: 0;
+    right: 0;
+    margin-top: 10px;
+    transform: none;
+  }
 }
 </style>
 </head>
@@ -272,13 +286,12 @@ canvas.addEventListener('touchend', (e)=>{
   if(!isTouching) return;
   isTouching = false;
 
-  // Calcula impulso en dirección del swipe
   const touch = e.changedTouches[0];
   const dx = touch.clientX - touchStartX;
   const dy = touch.clientY - touchStartY;
   const distance = Math.sqrt(dx*dx + dy*dy);
-  const dt = 0.02; // aproximación muy pequeña para simular impulso
-  const swipeVelocity = distance/dt * 0.00001; // factor de impulso
+  const dt = 0.02;
+  const swipeVelocity = distance/dt * 0.00001;
   if(swipeVelocity > 0.001){
     velocity = Math.min(Math.max(swipeVelocity, 0.2), 3);
     spinning = true;
