@@ -219,16 +219,13 @@ btnGirar.addEventListener('click', ()=>{
     // desaceleración progresiva
     velocity *= 0.985;
 
-    // efecto de rebote suave al final
+    // efecto de rebote: oscilación suave al final
     if(rotation >= metaRotation && velocity < 0.02){
-      const exceso = rotation - metaRotation;
-      // rebote oscilando con fracción de exceso
-      velocity = -exceso * 0.1;
-      metaRotation += exceso; // ajustar meta para rebote
+      velocity = -velocity * 0.2; // rebote invertido más pequeño
     }
 
-    // detenerse completamente si velocidad mínima
-    if(rotation >= metaRotation && Math.abs(velocity) < 0.001){
+    // detenerse completamente
+    if(Math.abs(velocity) < 0.001 && rotation >= metaRotation){
       spinning = false;
       rotation = metaRotation % (2*Math.PI);
       btnGirar.classList.add('brilho');
