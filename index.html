@@ -71,7 +71,7 @@ h1 {
   line-height: 1.4;
 }
 
-/* Slider unificado como barra de fuerza */
+/* Slider unificado como barra de fuerza (tamaño normal) */
 .slider-container {
   position: absolute;
   right: 10%;
@@ -85,7 +85,7 @@ h1 {
 
 #sliderFuerza {
   -webkit-appearance: none;
-  width: 120px;
+  width: 150px;
   height: 12px;
   background: linear-gradient(90deg, #28a745 0%, #28a745 0%, #ddd 0%, #ddd 100%);
   border-radius: 6px;
@@ -96,12 +96,12 @@ h1 {
 #sliderFuerza::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 25px;
-  height: 25px;
+  width: 60px;
+  height: 60px;
   background: url('palanca.png') center/contain no-repeat;
   border-radius: 50%;
   cursor: grab;
-  margin-top: -6px;
+  margin-top: -24px;
   transition: transform 0.2s;
 }
 
@@ -225,7 +225,6 @@ const slider=document.getElementById('sliderFuerza');
 
 slider.addEventListener('input',()=>{
   fuerza=parseInt(slider.value);
-  // actualizar el color de fondo para simular la barra de fuerza
   slider.style.background=`linear-gradient(90deg, #28a745 0%, #28a745 ${fuerza}%, #ddd ${fuerza}%, #ddd 100%)`;
   if(fuerza>=100) slider.classList.add('brillo');
   else slider.classList.remove('brillo');
