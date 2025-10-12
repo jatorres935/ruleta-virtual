@@ -76,22 +76,22 @@ h2 {
 
 .flecha {
   position: absolute;
-  right: 27%;
   top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(0deg);
   width: 0;
   height: 0;
-  border-top: 15px solid transparent;
-  border-bottom: 15px solid transparent;
-  border-left: 100px solid black;
-  transform: translateY(-50%) rotate(180deg);
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-bottom: 80px solid black;
   z-index: 5;
 }
 
 .boton-girar {
   position: absolute;
-  right: 20%;
-  top: 50%;
-  transform: translateY(-50%);
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 100px;
   height: 100px;
   background-color: #e74c3c;
@@ -173,37 +173,19 @@ h2 {
     max-width:350px;
     aspect-ratio: 1/1;
   }
-  /* Flecha arriba de la ruleta */
   .flecha{
-    position: relative;
-    top: -5px;
-    right: 0;
-    transform: rotate(0deg);
-    border-left: none;
+    top: calc(50% - 20px);
     border-bottom: 60px solid black;
-    border-top: none;
-    border-right: none;
-    margin-bottom: 10px;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
   }
-  /* Boton girar debajo de la ruleta */
   .boton-girar{
-    position: relative;
-    top: 0;
-    right: 0;
-    margin-top: 15px;
-    transform: none;
     width: 80px;
     height: 80px;
   }
   .boton-instrucciones{
-    bottom: 15px;
-    left: 15px;
     padding: 8px 16px;
     font-size: 0.9em;
-  }
-  #juego{
-    justify-content: flex-start;
-    padding-top: 20px;
   }
 }
 </style>
@@ -296,67 +278,6 @@ btnGirar.addEventListener('click', () => {
     requestAnimationFrame(animateSpin);
   }
   animateSpin();
-});
-
-/* Giro táctil manual */
-let touchStartX = 0;
-let touchStartY = 0;
-let touchStartAngle = 0;
-let isTouching = false;
-
-function getTouchAngle(x, y){
-  const rect = canvas.getBoundingClientRect();
-  const cx = rect.left + rect.width/2;
-  const cy = rect.top + rect.height/2;
-  return Math.atan2(y - cy, x - cx);
-}
-
-canvas.addEventListener('touchstart', (e)=>{
-  if(spinning) return;
-  const touch = e.touches[0];
-  touchStartX = touch.clientX;
-  touchStartY = touch.clientY;
-  touchStartAngle = getTouchAngle(touchStartX, touchStartY);
-  isTouching = true;
-});
-
-canvas.addEventListener('touchmove', (e)=>{
-  if(!isTouching || spinning) return;
-  const touch = e.touches[0];
-  const angle = getTouchAngle(touch.clientX, touch.clientY);
-  rotation += angle - touchStartAngle;
-  touchStartAngle = angle;
-  drawRoulette();
-});
-
-canvas.addEventListener('touchend', (e)=>{
-  if(!isTouching) return;
-  isTouching = false;
-  const touch = e.changedTouches[0];
-  const dx = touch.clientX - touchStartX;
-  const dy = touch.clientY - touchStartY;
-  const distance = Math.sqrt(dx*dx + dy*dy);
-  const dt = 0.02;
-  const swipeVelocity = distance/dt * 0.00001;
-  if(swipeVelocity > 0.001){
-    velocity = Math.min(Math.max(swipeVelocity, 0.2), 3);
-    spinning = true;
-    function animateTouchSpin(){
-      if(!spinning) return;
-      rotation += velocity;
-      velocity *= 0.985;
-      if(velocity < 0.002){
-        spinning = false;
-        velocity = 0;
-        drawRoulette();
-        btnGirar.classList.add('brilho');
-        return;
-      }
-      drawRoulette();
-      requestAnimationFrame(animateTouchSpin);
-    }
-    animateTouchSpin();
-  }
 });
 
 /* Boton instrucciones en la ruleta */
