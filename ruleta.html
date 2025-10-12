@@ -5,156 +5,141 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Ruleta de Emociones</title>
 <style>
-  /* --- Layout base --- */
-  :root{
+  :root {
     --container-w: 90vw;
     --container-max: 520px;
   }
-  body{
-    margin:0;
+
+  body {
+    margin: 0;
     font-family: Arial, sans-serif;
     background: white;
     color: black;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-    overflow:hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
   }
 
-  /* Contenedor con ratio 1:1 para mantener la ruleta perfectamente redonda */
-  #container{
-    position:relative;
-    width:var(--container-w);
-    max-width:var(--container-max);
-    aspect-ratio: 1 / 1;       /* fuerza cuadro cuadrado */
-    box-sizing: border-box;
+  #container {
+    position: relative;
+    width: var(--container-w);
+    max-width: var(--container-max);
+    aspect-ratio: 1 / 1; /* mantiene forma perfectamente circular */
   }
 
-  /* Canvas ocupa totalmente el área del contenedor (siempre cuadrado) */
-  #ruleta{
-    display:block;
-    width:100%;
-    height:100%;
-    border-radius:50%;
-    box-sizing:border-box;
-    touch-action:none;
+  #ruleta {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    touch-action: none;
   }
 
-  /* Flecha centrada justo encima del eje superior interior de la ruleta */
-  .flecha{
-    position:absolute;
-    left:50%;
-    top:6%;                    /* dentro del contenedor, ligeramente abajo del borde superior para quedar sobre la rueda */
-    transform:translateX(-50%) translateY(-50%);
-    width:0;
-    height:0;
-    z-index:20;
-    /* tamaño proporcional */
-    border-left: calc(6% ) solid transparent;
-    border-right: calc(6% ) solid transparent;
-    border-bottom: calc(12% ) solid black;
+  /* ✅ Flecha centrada justo en el eje de la ruleta */
+  .flecha {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(0deg);
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 40px solid black;
+    z-index: 20;
+    pointer-events: none;
   }
 
-  /* Botones: colocados siempre fuera del círculo (empujados hacia afuera con % negativos) */
-  .boton-girar{
-    position:absolute;
-    top: -12%;                 /* fuera, por arriba del contenedor */
-    left: 6%;
-    width: 82px;
-    height: 82px;
-    min-width:56px;
-    min-height:56px;
-    border-radius:50%;
-    background:#e74c3c;
-    color:white;
-    border:none;
-    z-index:30;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    cursor:pointer;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+  .boton-girar {
+    position: absolute;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 30;
   }
 
-  .boton-instrucciones{
-    position:absolute;
-    bottom:-10%;               /* fuera, por debajo del contenedor */
-    left:6%;
-    z-index:30;
-    background:#28a745;
-    color:white;
-    border:none;
-    padding:10px 16px;
-    border-radius:8px;
-    cursor:pointer;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+  .boton-instrucciones,
+  .boton-volver {
+    position: absolute;
+    bottom: -12%;
+    z-index: 30;
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
   }
 
-  .boton-volver{
-    position:absolute;
-    bottom:-10%;               /* fuera, por debajo del contenedor */
-    right:6%;
-    z-index:30;
-    background:#3498db;
-    color:white;
-    border:none;
-    padding:10px 16px;
-    border-radius:8px;
-    cursor:pointer;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.08);
-  }
+  .boton-instrucciones { left: 6%; }
+  .boton-volver { right: 6%; }
 
-  /* --- Responsive tweaks --- */
-  /* Móviles verticales: botón Girar arriba, centrado y fuera del círculo */
-  @media (max-width:768px) and (orientation:portrait){
-    :root{ --container-w: 92vw; --container-max: 420px; }
-    .flecha{
-      top:7%;
-      border-left: calc(8% ) solid transparent;
-      border-right: calc(8% ) solid transparent;
-      border-bottom: calc(14% ) solid black;
-    }
-    .boton-girar{
-      top: -14%;
+  /* 📱 Móviles vertical */
+  @media (max-width: 768px) and (orientation: portrait) {
+    .boton-girar {
+      top: -12%;
       left: 50%;
       transform: translateX(-50%);
-      width:76px;
-      height:76px;
+      width: 65px;
+      height: 65px;
     }
-    .boton-instrucciones{ bottom:-12%; left:6%; }
-    .boton-volver{ bottom:-12%; right:6%; }
   }
 
-  /* Móviles horizontales: botón Girar en esquina superior izquierda (fuera) */
-  @media (max-width:1024px) and (orientation:landscape){
-    :root{ --container-w: 72vw; --container-max: 520px; }
-    .flecha{
-      top:5%;
-      border-left: calc(6% ) solid transparent;
-      border-right: calc(6% ) solid transparent;
-      border-bottom: calc(12% ) solid black;
+  /* 📱 Móviles horizontales */
+  @media (max-width: 1024px) and (orientation: landscape) {
+    .boton-girar {
+      top: 5%;
+      left: 5%;
+      transform: none;
+      width: 60px;
+      height: 60px;
     }
-    .boton-girar{
-      top:5%;
-      left:5%;
-      transform:none;
-      width:64px;
-      height:64px;
-    }
-    .boton-instrucciones{ bottom:-9%; left:5%; }
-    .boton-volver{ bottom:-9%; right:5%; }
   }
 
-  /* Extra small devices */
-  @media (max-width:360px){
-    .boton-girar{ width:64px;height:64px; top:-16%; }
-    .boton-instrucciones, .boton-volver{ padding:8px 12px; font-size:0.9em; bottom:-14%; }
+  /* 🖥️ PC */
+  @media (min-width: 1025px) {
+    .boton-girar {
+      top: -14%;
+      left: 10%;
+    }
+  }
+
+  #modal {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 100;
+  }
+
+  #cerrar {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  #imagenAmpliada {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 10px;
   }
 </style>
 </head>
 <body>
-
   <div id="container">
     <canvas id="ruleta" width="500" height="500"></canvas>
     <div class="flecha"></div>
@@ -164,15 +149,13 @@
     <button class="boton-volver" id="btnVolver">Inicio</button>
   </div>
 
-  <div id="modal" class="modal" style="display:flex;">
-    <span id="cerrar" class="cerrar" style="cursor:pointer;">&times;</span>
-    <img id="imagenAmpliada" src="Instrucciones.png" alt="Instrucciones ampliadas" style="max-width:90%; max-height:90%; border-radius:10px;">
+  <div id="modal">
+    <span id="cerrar">&times;</span>
+    <img id="imagenAmpliada" src="Instrucciones.png" alt="Instrucciones ampliadas" />
   </div>
 
 <script>
-/* --- Mantengo exactamente tu lógica JS, solo enlazo elementos --- */
-
-/* Ruleta funcional */
+/* === Lógica original intacta === */
 const canvas = document.getElementById('ruleta');
 const ctx = canvas.getContext('2d');
 const img = new Image();
@@ -181,7 +164,6 @@ let rotation = 0, spinning = false, velocity = 0, lastSegment = -1;
 img.onload = () => drawRoulette();
 
 function drawRoulette(){
-  // Dibuja usando el tamaño del canvas real (500x500) - canvas escala visualmente por CSS
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.save();
   ctx.translate(canvas.width/2, canvas.height/2);
@@ -190,7 +172,7 @@ function drawRoulette(){
   ctx.restore();
 }
 
-/* Boton girar */
+/* Botón Girar */
 const btnGirar = document.getElementById('btnGirar');
 btnGirar.addEventListener('click', () => {
   if(spinning) return;
@@ -203,6 +185,7 @@ btnGirar.addEventListener('click', () => {
   do { segment = Math.floor(Math.random() * segmentos); }
   while(segment === lastSegment);
   lastSegment = segment;
+
   function animateSpin(){
     if(!spinning) return;
     rotation += velocity;
@@ -219,47 +202,34 @@ btnGirar.addEventListener('click', () => {
   animateSpin();
 });
 
-/* Boton instrucciones / modal */
-const btnInstrucciones = document.getElementById('btnInstrucciones');
+/* Modal de instrucciones */
 const modal = document.getElementById('modal');
-btnInstrucciones.addEventListener('click', () => modal.style.display = 'flex');
+document.getElementById('btnInstrucciones').addEventListener('click', () => modal.style.display = 'flex');
 document.getElementById('cerrar').onclick = () => modal.style.display = 'none';
 window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
 
-/* Boton volver */
+/* Botón volver */
 document.getElementById('btnVolver').addEventListener('click', () => {
   window.location.href = 'index.html';
 });
 
-/* Giro manual - solo rota mientras arrastras, sin impulso al soltar */
-let lastX = 0, lastRotation = 0, isDragging = false;
-
-canvas.addEventListener('pointerdown', (e) => {
+/* Giro manual sin impulso */
+let isDragging = false, lastX = 0, lastRotation = 0;
+canvas.addEventListener('pointerdown', e => {
   if (spinning) return;
   isDragging = true;
   lastX = e.clientX;
   lastRotation = rotation;
   canvas.setPointerCapture(e.pointerId);
 });
-
-canvas.addEventListener('pointermove', (e) => {
+canvas.addEventListener('pointermove', e => {
   if (!isDragging) return;
-  const x = e.clientX;
-  const delta = (x - lastX) / 100; // sensibilidad suave
+  const delta = (e.clientX - lastX) / 100;
   rotation = lastRotation + delta;
   drawRoulette();
 });
-
-canvas.addEventListener('pointerup', (e) => {
-  isDragging = false;
-  // no impulso al soltar (según requisito)
-});
-
-/* Asegurar que el canvas se redibuje si el tamaño visual cambia (p. ej. rotate device) */
-window.addEventListener('resize', () => {
-  // opcional: forzamos redibujo para evitar artefactos
-  drawRoulette();
-});
+canvas.addEventListener('pointerup', () => { isDragging = false; });
+window.addEventListener('resize', drawRoulette);
 </script>
 </body>
 </html>
