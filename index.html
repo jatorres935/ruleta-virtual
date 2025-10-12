@@ -71,24 +71,36 @@ h1 {
   line-height: 1.4;
 }
 
+/* Botón de girar rojo y redondo con efecto parpadeo */
 .boton-girar {
   position: absolute;
-  right: 21%; /* cerca de la flecha */
+  right: 21%;
   top: 50%;
   transform: translateY(-50%);
-  padding: 15px 25px;
-  font-size: 1em;
-  background-color: #28a745;
+  width: 80px;
+  height: 80px;
+  background-color: #e74c3c;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 50%;
+  font-size: 1em;
   cursor: pointer;
   z-index: 10;
-  transition: 0.3s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
 }
 
 .boton-girar:hover {
-  background-color: #1e7e34;
+  background-color: #c0392b;
+  transform: scale(1.1);
+  animation: brillo 0.5s infinite alternate;
+}
+
+@keyframes brillo {
+  0% { box-shadow: 0 0 5px 0 rgba(255,0,0,0.7); }
+  100% { box-shadow: 0 0 20px 5px rgba(255,0,0,1); }
 }
 
 /* Botones y modal */
@@ -190,19 +202,35 @@ function drawRoulette(){
 function animate(){
   if(!spinning) return;
   rotation+=velocity;
-  velocity*=0.98;
+  velocity*=0.985;
   drawRoulette();
-  if(velocity<0.002) spinning=false;
+  if(velocity<0.001) spinning=false;
   requestAnimationFrame(animate);
 }
 
 const btnGirar=document.getElementById('btnGirar');
-btnGirar.addEventListener('click',()=>{
+let fuerza=0;
+let presionInterval;
+
+btnGirar.addEventListener('mousedown',()=>{
+  fuerza=0;
+  presionInterval=setInterval(()=>{
+    if(fuerza<100) fuerza+=2; // aumenta fuerza mientras se mantiene presionado
+  },30);
+});
+
+btnGirar.addEventListener('mouseup',()=>{
+  clearInterval(presionInterval);
   if(!spinning){
     spinning=true;
-    velocity=Math.random()*0.5+0.2; // fuerza aleatoria
+    // convertir fuerza en velocidad
+    velocity=0.005*fuerza + 0.3; // mínimo 0.3, máximo ~0.8+
     animate();
   }
+});
+
+btnGirar.addEventListener('mouseleave',()=>{
+  clearInterval(presionInterval);
 });
 
 /* Modal */
