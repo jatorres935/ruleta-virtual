@@ -52,7 +52,7 @@ h2 {
 #juego {
   display: none;
   width: 100%;
-  min-height: 80vh;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -78,11 +78,11 @@ h2 {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) rotate(0deg);
+  transform: translate(-50%, -100%);
   width: 0;
   height: 0;
-  border-left: 15px solid transparent;
-  border-right: 15px solid transparent;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
   border-bottom: 80px solid black;
   z-index: 5;
 }
@@ -174,10 +174,10 @@ h2 {
     aspect-ratio: 1/1;
   }
   .flecha{
-    top: calc(50% - 20px);
-    border-bottom: 60px solid black;
     border-left: 12px solid transparent;
     border-right: 12px solid transparent;
+    border-bottom: 60px solid black;
+    transform: translate(-50%, -90%);
   }
   .boton-girar{
     width: 80px;
