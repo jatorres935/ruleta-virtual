@@ -61,6 +61,18 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: box-shadow 0.3s ease;
+}
+
+/* Efecto de brillo y parpadeo */
+@keyframes brilloParpadeo {
+  0% { box-shadow: 0 0 10px 2px rgba(255,255,255,0.4); }
+  50% { box-shadow: 0 0 25px 5px rgba(255,255,255,0.8); }
+  100% { box-shadow: 0 0 10px 2px rgba(255,255,255,0.4); }
+}
+
+.boton-girar.brillante {
+  animation: brilloParpadeo 1s infinite alternate;
 }
 
 .boton-instrucciones {
@@ -148,7 +160,7 @@ img.onload = () => drawRoulette();
 function drawRoulette(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.save();
-  ctx.translate(canvas.width/2, canvas.height/2);
+  ctx.translate(canvas.width/2,canvas.height/2);
   ctx.rotate(rotation);
   ctx.drawImage(img,-canvas.width/2,-canvas.height/2,canvas.width,canvas.height);
   ctx.restore();
@@ -156,8 +168,11 @@ function drawRoulette(){
 
 /* Boton girar */
 const btnGirar = document.getElementById('btnGirar');
+btnGirar.classList.add('brillante'); // Empieza con el efecto activo (ruleta parada)
+
 btnGirar.addEventListener('click', () => {
   if(spinning) return;
+  btnGirar.classList.remove('brillante'); // quita el brillo al iniciar el giro
   spinning = true;
   let baseVelocity = Math.random() * 1.2 + 0.3;
   if(Math.random() < 0.25) baseVelocity += Math.random()*2 + 1;
@@ -167,6 +182,7 @@ btnGirar.addEventListener('click', () => {
   do { segment = Math.floor(Math.random() * segmentos); } 
   while(segment === lastSegment);
   lastSegment = segment;
+
   function animateSpin(){
     if(!spinning) return;
     rotation += velocity;
@@ -175,6 +191,7 @@ btnGirar.addEventListener('click', () => {
       spinning = false;
       velocity = 0;
       drawRoulette();
+      btnGirar.classList.add('brillante'); // vuelve a brillar al detenerse
       return;
     }
     drawRoulette();
@@ -214,7 +231,7 @@ canvas.addEventListener('pointermove', (e) => {
   drawRoulette();
 });
 
-canvas.addEventListener('pointerup', (e) => {
+canvas.addEventListener('pointerup', () => {
   isDragging = false; // No se genera impulso al soltar
 });
 </script>
