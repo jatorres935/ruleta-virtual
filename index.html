@@ -40,7 +40,7 @@ h1 {
   height: auto;
   position: relative;
   z-index: 1;
-  touch-action: none; /* importante para manejo táctil */
+  touch-action: none; /* importante para control táctil */
 }
 
 .flecha {
@@ -199,14 +199,12 @@ function drawRoulette(){
 const btnGirar = document.getElementById('btnGirar');
 btnGirar.classList.add('brilho');
 
-// Botón rojo
 btnGirar.addEventListener('click', () => {
   if(spinning) return;
   btnGirar.classList.remove('brilho');
 
   spinning = true;
 
-  // Velocidad inicial aleatoria con giro extra posible
   let baseVelocity = Math.random() * 1.2 + 0.3;
   if(Math.random() < 0.25) baseVelocity += Math.random()*2 + 1;
   velocity = baseVelocity;
@@ -221,7 +219,6 @@ btnGirar.addEventListener('click', () => {
 
   const anglePerSegment = 2*Math.PI / segmentos;
   const offset = Math.random() * anglePerSegment;
-  const metaRotation = rotation + vueltas*2*Math.PI + segment*anglePerSegment + offset;
 
   function animateSpin(){
     if(!spinning) return;
@@ -240,27 +237,51 @@ btnGirar.addEventListener('click', () => {
   animateSpin();
 });
 
-/* Giro manual por impulso táctil */
+/* Giro táctil manual en cualquier dirección */
+let touchStartX = 0;
 let touchStartY = 0;
-let touchStartTime = 0;
+let touchStartAngle = 0;
+let isTouching = false;
+
+function getTouchAngle(x, y){
+  const rect = canvas.getBoundingClientRect();
+  const cx = rect.left + rect.width/2;
+  const cy = rect.top + rect.height/2;
+  return Math.atan2(y - cy, x - cx);
+}
 
 canvas.addEventListener('touchstart', (e)=>{
   if(spinning) return;
   const touch = e.touches[0];
+  touchStartX = touch.clientX;
   touchStartY = touch.clientY;
-  touchStartTime = Date.now();
+  touchStartAngle = getTouchAngle(touchStartX, touchStartY);
+  isTouching = true;
+});
+
+canvas.addEventListener('touchmove', (e)=>{
+  if(!isTouching || spinning) return;
+  const touch = e.touches[0];
+  const angle = getTouchAngle(touch.clientX, touch.clientY);
+  rotation += angle - touchStartAngle;
+  touchStartAngle = angle;
+  drawRoulette();
 });
 
 canvas.addEventListener('touchend', (e)=>{
-  if(spinning) return;
-  const touch = e.changedTouches[0];
-  const deltaY = touchStartY - touch.clientY;
-  const deltaTime = (Date.now() - touchStartTime)/1000;
-  const speed = deltaY/deltaTime * 0.0005; // factor de impulso
-  if(Math.abs(speed) > 0.001){ // mínimo impulso para activarse
-    velocity = Math.min(Math.max(Math.abs(speed),0.2),3); // limita velocidad
-    spinning = true;
+  if(!isTouching) return;
+  isTouching = false;
 
+  // Calcula impulso en dirección del swipe
+  const touch = e.changedTouches[0];
+  const dx = touch.clientX - touchStartX;
+  const dy = touch.clientY - touchStartY;
+  const distance = Math.sqrt(dx*dx + dy*dy);
+  const dt = 0.02; // aproximación muy pequeña para simular impulso
+  const swipeVelocity = distance/dt * 0.00001; // factor de impulso
+  if(swipeVelocity > 0.001){
+    velocity = Math.min(Math.max(swipeVelocity, 0.2), 3);
+    spinning = true;
     function animateTouchSpin(){
       if(!spinning) return;
       rotation += velocity;
