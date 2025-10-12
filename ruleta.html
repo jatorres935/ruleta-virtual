@@ -163,7 +163,17 @@ capas.forEach(c => {
   img.onload = () => {
     c.img = img;
     imagesLoaded++;
-    if (imagesLoaded === capas.length) drawAll();
+    if (imagesLoaded === capas.length) {
+      // === NUEVO (único cambio funcional): usar el tamaño real de tus PNG ===
+      // (asumiendo que los 3 tienen el mismo tamaño)
+      const baseW = capas[0].img.naturalWidth;
+      const baseH = capas[0].img.naturalHeight;
+      canvas.width = baseW;
+      canvas.height = baseH;
+      // ================================================================
+
+      drawAll();
+    }
   };
 });
 
