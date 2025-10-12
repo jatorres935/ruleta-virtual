@@ -16,35 +16,58 @@ body {
   align-items: center;
 }
 
-h1 {
-  margin-top: 20px;
-  font-size: 2em;
+/* Primera pantalla */
+#bienvenida {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
-  padding: 0 10px;
+}
+
+h1 {
+  font-size: 2em;
+  margin-bottom: 10px;
 }
 
 h2 {
-  margin-top: 5px; /* más cerca del título */
-  font-size: 1.1em; /* subtítulo más pequeño */
-  text-align: center;
+  font-size: 1.1em;
   color: #333;
+  margin-bottom: 30px;
 }
 
-.container {
-  position: relative;
+#btnEntrar {
+  font-size: 1.2em;
+  padding: 15px 30px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#btnEntrar:hover { background-color: #1d6fa5; }
+
+/* Contenedor principal de ruleta */
+#juego {
+  display: none;
   width: 100%;
   min-height: 80vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-wrap: wrap;
+  flex-direction: column;
+  position: relative;
 }
 
 #ruleta {
   border-radius: 50%;
   cursor: pointer;
   max-width: 95vw;
-  max-height: 70vh;
+  max-height: 60vh;
   height: auto;
   position: relative;
   z-index: 1;
@@ -110,7 +133,7 @@ h2 {
 
 .boton-instrucciones:hover { background-color: #1e7e34; }
 
-/* Modal estilo pantalla completa */
+/* Modal pantalla completa */
 .modal {
   display: none;
   position: fixed;
@@ -141,7 +164,6 @@ h2 {
 }
 
 @media (max-width:768px){
-  .container{flex-direction:column; align-items:center;}
   h1{font-size:1.8em;}
   h2{font-size:1em;}
   #ruleta{
@@ -172,10 +194,15 @@ h2 {
 </head>
 <body>
 
-<h1>Especulaciones sobre posibles futuros de la crisis climática</h1>
-<h2>Lector de emociones: Instrumento para identificar emociones</h2>
+<!-- Pantalla de bienvenida -->
+<div id="bienvenida">
+  <h1>Especulaciones sobre posibles futuros de la crisis climática</h1>
+  <h2>Lector de emociones: Instrumento para identificar emociones</h2>
+  <button id="btnEntrar">Entrar</button>
+</div>
 
-<div class="container">
+<!-- Juego principal -->
+<div id="juego">
   <canvas id="ruleta" width="500" height="500"></canvas>
   <div class="flecha"></div>
   <button class="boton-girar" id="btnGirar">Girar</button>
@@ -183,12 +210,31 @@ h2 {
 
 <button class="boton-instrucciones" id="btnInstrucciones">Instrucciones</button>
 
+<!-- Modal instrucciones -->
 <div id="modal" class="modal">
   <span id="cerrar" class="cerrar">&times;</span>
   <img id="imagenAmpliada" src="Instrucciones.png" alt="Instrucciones ampliadas">
 </div>
 
 <script>
+/* Control bienvenida y entrar */
+const btnEntrar = document.getElementById('btnEntrar');
+const bienvenida = document.getElementById('bienvenida');
+const juego = document.getElementById('juego');
+const modal = document.getElementById('modal');
+
+btnEntrar.addEventListener('click', () => {
+  bienvenida.style.display = 'none';
+  juego.style.display = 'flex';
+  modal.style.display = 'flex'; // abre instrucciones al entrar
+});
+
+/* Cerrar modal */
+document.getElementById('cerrar').onclick = () => modal.style.display = 'none';
+document.getElementById('btnInstrucciones').onclick = () => modal.style.display = 'flex';
+window.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; };
+
+/* Ruleta funcional como antes */
 const canvas = document.getElementById('ruleta');
 const ctx = canvas.getContext('2d');
 const img = new Image();
@@ -205,24 +251,22 @@ function drawRoulette(){
   ctx.restore();
 }
 
+/* Boton girar */
 const btnGirar = document.getElementById('btnGirar');
 btnGirar.classList.add('brilho');
 
 btnGirar.addEventListener('click', () => {
   if(spinning) return;
   btnGirar.classList.remove('brilho');
-
   spinning = true;
   let baseVelocity = Math.random() * 1.2 + 0.3;
   if(Math.random() < 0.25) baseVelocity += Math.random()*2 + 1;
   velocity = baseVelocity;
-
   const segmentos = 8;
   let segment;
   do { segment = Math.floor(Math.random() * segmentos); } 
   while(segment === lastSegment);
   lastSegment = segment;
-
   function animateSpin(){
     if(!spinning) return;
     rotation += velocity;
@@ -300,12 +344,6 @@ canvas.addEventListener('touchend', (e)=>{
     animateTouchSpin();
   }
 });
-
-/* Modal */
-const modal = document.getElementById('modal');
-document.getElementById('btnInstrucciones').onclick = () => modal.style.display = 'flex';
-document.getElementById('cerrar').onclick = () => modal.style.display = 'none';
-window.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; };
 </script>
 </body>
 </html>
