@@ -1,161 +1,125 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ruleta de Emociones</title>
 <style>
-  :root {
-    --container-w: 90vw;
-    --container-max: 520px;
-  }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: white;
+  color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
 
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: white;
-    color: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    overflow: hidden;
-  }
+#ruleta {
+  border-radius: 50%;
+  cursor: pointer;
+  width: 80vw;
+  max-width: 500px;
+  height: auto;
+  aspect-ratio: 1/1;
+  position: relative;
+  z-index: 1;
+  touch-action: none;
+}
 
-  #container {
-    position: relative;
-    width: var(--container-w);
-    max-width: var(--container-max);
-    aspect-ratio: 1 / 1; /* mantiene forma perfectamente circular */
-  }
+.flecha {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-bottom: 80px solid black;
+  z-index: 5;
+}
 
-  #ruleta {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    touch-action: none;
-  }
+.boton-girar {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 100px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.1em;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  /* ✅ Flecha centrada justo en el eje de la ruleta */
-  .flecha {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(0deg);
-    width: 0;
-    height: 0;
-    border-left: 15px solid transparent;
-    border-right: 15px solid transparent;
-    border-bottom: 40px solid black;
-    z-index: 20;
-    pointer-events: none;
-  }
+.boton-instrucciones {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background-color: #28a745;
+  border: none;
+  color: white;
+  font-size: 1em;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 10;
+}
 
-  .boton-girar {
-    position: absolute;
-    background: #e74c3c;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 70px;
-    height: 70px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 30;
-  }
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.8);
+  justify-content: center;
+  align-items: center;
+}
 
-  .boton-instrucciones,
-  .boton-volver {
-    position: absolute;
-    bottom: -12%;
-    z-index: 30;
-    background: #3498db;
-    color: white;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-  }
+.modal img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 10px;
+}
 
-  .boton-instrucciones { left: 6%; }
-  .boton-volver { right: 6%; }
-
-  /* 📱 Móviles vertical */
-  @media (max-width: 768px) and (orientation: portrait) {
-    .boton-girar {
-      top: -12%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 65px;
-      height: 65px;
-    }
-  }
-
-  /* 📱 Móviles horizontales */
-  @media (max-width: 1024px) and (orientation: landscape) {
-    .boton-girar {
-      top: 5%;
-      left: 5%;
-      transform: none;
-      width: 60px;
-      height: 60px;
-    }
-  }
-
-  /* 🖥️ PC */
-  @media (min-width: 1025px) {
-    .boton-girar {
-      top: -14%;
-      left: 10%;
-    }
-  }
-
-  #modal {
-    display: none;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.85);
-    z-index: 100;
-  }
-
-  #cerrar {
-    position: absolute;
-    top: 20px;
-    right: 30px;
-    color: white;
-    font-size: 40px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  #imagenAmpliada {
-    max-width: 90%;
-    max-height: 90%;
-    border-radius: 10px;
-  }
+.cerrar {
+  position: absolute;
+  top: 20px;
+  right: 40px;
+  font-size: 2em;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
 </style>
 </head>
 <body>
-  <div id="container">
-    <canvas id="ruleta" width="500" height="500"></canvas>
-    <div class="flecha"></div>
 
-    <button class="boton-girar" id="btnGirar">Girar</button>
-    <button class="boton-instrucciones" id="btnInstrucciones">Instrucciones</button>
-    <button class="boton-volver" id="btnVolver">Inicio</button>
-  </div>
+<canvas id="ruleta" width="500" height="500"></canvas>
+<div class="flecha"></div>
+<button class="boton-girar" id="btnGirar">Girar</button>
+<button class="boton-instrucciones" id="btnInstrucciones">Instrucciones</button>
 
-  <div id="modal">
-    <span id="cerrar">&times;</span>
-    <img id="imagenAmpliada" src="Instrucciones.png" alt="Instrucciones ampliadas" />
-  </div>
+<div id="modal" class="modal">
+  <span id="cerrar" class="cerrar">&times;</span>
+  <img id="imagenAmpliada" src="Instrucciones.png" alt="Instrucciones ampliadas">
+</div>
 
 <script>
-/* === Lógica original intacta === */
+/* Ruleta funcional */
 const canvas = document.getElementById('ruleta');
 const ctx = canvas.getContext('2d');
 const img = new Image();
@@ -172,7 +136,7 @@ function drawRoulette(){
   ctx.restore();
 }
 
-/* Botón Girar */
+/* Boton girar */
 const btnGirar = document.getElementById('btnGirar');
 btnGirar.addEventListener('click', () => {
   if(spinning) return;
@@ -182,10 +146,9 @@ btnGirar.addEventListener('click', () => {
   velocity = baseVelocity;
   const segmentos = 8;
   let segment;
-  do { segment = Math.floor(Math.random() * segmentos); }
+  do { segment = Math.floor(Math.random() * segmentos); } 
   while(segment === lastSegment);
   lastSegment = segment;
-
   function animateSpin(){
     if(!spinning) return;
     rotation += velocity;
@@ -202,34 +165,12 @@ btnGirar.addEventListener('click', () => {
   animateSpin();
 });
 
-/* Modal de instrucciones */
+/* Boton instrucciones */
+const btnInstrucciones = document.getElementById('btnInstrucciones');
 const modal = document.getElementById('modal');
-document.getElementById('btnInstrucciones').addEventListener('click', () => modal.style.display = 'flex');
+btnInstrucciones.addEventListener('click', () => modal.style.display = 'flex');
 document.getElementById('cerrar').onclick = () => modal.style.display = 'none';
-window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
-
-/* Botón volver */
-document.getElementById('btnVolver').addEventListener('click', () => {
-  window.location.href = 'index.html';
-});
-
-/* Giro manual sin impulso */
-let isDragging = false, lastX = 0, lastRotation = 0;
-canvas.addEventListener('pointerdown', e => {
-  if (spinning) return;
-  isDragging = true;
-  lastX = e.clientX;
-  lastRotation = rotation;
-  canvas.setPointerCapture(e.pointerId);
-});
-canvas.addEventListener('pointermove', e => {
-  if (!isDragging) return;
-  const delta = (e.clientX - lastX) / 100;
-  rotation = lastRotation + delta;
-  drawRoulette();
-});
-canvas.addEventListener('pointerup', () => { isDragging = false; });
-window.addEventListener('resize', drawRoulette);
+window.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; };
 </script>
 </body>
 </html>
