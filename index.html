@@ -6,8 +6,8 @@
 <title>Ruleta de Emociones</title>
 <style>
 body {
-  background-color: white;
-  color: black;
+  background-color: black;
+  color: white;
   font-family: Arial, sans-serif;
   margin: 0;
   overflow-x: hidden;
@@ -28,18 +28,18 @@ body {
 }
 
 h1 {
-  font-size: 2em;
+  font-size: 2.2em;
   margin-bottom: 10px;
 }
 
 h2 {
-  font-size: 1.1em;
-  color: #333;
+  font-size: 1.2em;
+  color: #ddd;
   margin-bottom: 30px;
 }
 
 #btnEntrar {
-  font-size: 1.2em;
+  font-size: 1.3em;
   padding: 15px 30px;
   background-color: #3498db;
   color: white;
@@ -66,8 +66,9 @@ h2 {
 #ruleta {
   border-radius: 50%;
   cursor: pointer;
-  max-width: 95vw;
-  max-height: 60vh;
+  width: 80vw;
+  max-width: 600px;
+  max-height: 80vh;
   height: auto;
   position: relative;
   z-index: 1;
@@ -80,9 +81,9 @@ h2 {
   top: 50%;
   width: 0;
   height: 0;
-  border-top: 12px solid transparent;
-  border-bottom: 12px solid transparent;
-  border-left: 90px solid black;
+  border-top: 15px solid transparent;
+  border-bottom: 15px solid transparent;
+  border-left: 100px solid white;
   transform: translateY(-50%) rotate(180deg);
   z-index: 5;
 }
@@ -116,23 +117,6 @@ h2 {
   100% { box-shadow: 0 0 25px 5px rgba(255,0,0,0.9); }
 }
 
-.boton-instrucciones {
-  position: fixed;
-  left: 10px;
-  bottom: 10px;
-  background-color: #28a745;
-  border: none;
-  color: white;
-  font-size: 1em;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.3s;
-  z-index: 50;
-}
-
-.boton-instrucciones:hover { background-color: #1e7e34; }
-
 /* Modal pantalla completa */
 .modal {
   display: none;
@@ -142,7 +126,7 @@ h2 {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.8);
+  background-color: rgba(0,0,0,0.9);
   justify-content: center;
   align-items: center;
 }
@@ -168,7 +152,7 @@ h2 {
   h2{font-size:1em;}
   #ruleta{
     width:90vw;
-    max-width:350px;
+    max-width:400px;
     max-height:60vh;
   }
   .flecha{
@@ -177,7 +161,7 @@ h2 {
     right: 0;
     transform: rotate(90deg);
     border-left: none;
-    border-right: 50px solid black;
+    border-right: 60px solid white;
     margin-bottom: 10px;
   }
   .boton-girar{
@@ -208,8 +192,6 @@ h2 {
   <button class="boton-girar" id="btnGirar">Girar</button>
 </div>
 
-<button class="boton-instrucciones" id="btnInstrucciones">Instrucciones</button>
-
 <!-- Modal instrucciones -->
 <div id="modal" class="modal">
   <span id="cerrar" class="cerrar">&times;</span>
@@ -231,10 +213,9 @@ btnEntrar.addEventListener('click', () => {
 
 /* Cerrar modal */
 document.getElementById('cerrar').onclick = () => modal.style.display = 'none';
-document.getElementById('btnInstrucciones').onclick = () => modal.style.display = 'flex';
 window.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; };
 
-/* Ruleta funcional como antes */
+/* Ruleta funcional */
 const canvas = document.getElementById('ruleta');
 const ctx = canvas.getContext('2d');
 const img = new Image();
