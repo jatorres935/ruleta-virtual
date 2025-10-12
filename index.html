@@ -215,16 +215,16 @@ btnGirar.addEventListener('click', ()=>{
     if(!spinning) return;
 
     rotation += velocity;
-    
+
     // desaceleración progresiva
     velocity *= 0.985;
 
-    // detenerse completamente
-    if(rotation >= metaRotation && velocity < 0.002){
+    // detenerse suavemente
+    if(velocity < 0.002){
       spinning = false;
-      rotation = metaRotation % (2*Math.PI);
-      btnGirar.classList.add('brilho');
+      velocity = 0; // solo detener la animación sin saltos
       drawRoulette();
+      btnGirar.classList.add('brilho');
       return;
     }
 
