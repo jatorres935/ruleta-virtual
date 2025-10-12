@@ -39,7 +39,7 @@ body {
   height: 0;
   border-left: 12px solid transparent;
   border-right: 12px solid transparent;
-  border-bottom: 50px solid black; /* Flecha un poco más pequeña */
+  border-bottom: 50px solid black;
   z-index: 5;
 }
 
@@ -91,7 +91,7 @@ body {
 }
 
 .modal {
-  display: flex; /* Mostramos al cargar */
+  display: flex;
   position: fixed;
   z-index: 100;
   left: 0;
@@ -120,7 +120,15 @@ body {
 }
 
 @media (max-width:768px){
-  .boton-girar { bottom: 150px; width: 80px; height: 80px; }
+  .boton-girar {
+    bottom: auto;
+    left: auto;
+    right: 10px; /* Mueve el botón girar a la derecha en móvil */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 80px;
+    height: 80px;
+  }
 }
 </style>
 </head>
@@ -197,7 +205,7 @@ document.getElementById('btnVolver').addEventListener('click', () => {
   window.location.href = 'index.html';
 });
 
-/* Giro manual en móviles */
+/* Giro manual en móviles: solo mueve la ruleta, no genera impulso */
 let lastX, lastRotation = 0, isDragging = false;
 
 canvas.addEventListener('pointerdown', (e) => {
@@ -217,28 +225,7 @@ canvas.addEventListener('pointermove', (e) => {
 });
 
 canvas.addEventListener('pointerup', (e) => {
-  if(!isDragging) return;
-  isDragging = false;
-  // Velocidad según último movimiento
-  let x = e.clientX || e.changedTouches?.[0]?.clientX;
-  velocity = (x - lastX)/30;
-  if(Math.abs(velocity) > 0.01){
-    spinning = true;
-    function animateManual(){
-      if(!spinning) return;
-      rotation += velocity;
-      velocity *= 0.98;
-      if(Math.abs(velocity) < 0.002){
-        spinning = false;
-        velocity = 0;
-        drawRoulette();
-        return;
-      }
-      drawRoulette();
-      requestAnimationFrame(animateManual);
-    }
-    animateManual();
-  }
+  isDragging = false; // No se genera impulso al soltar
 });
 </script>
 </body>
