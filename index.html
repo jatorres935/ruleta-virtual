@@ -71,10 +71,10 @@ h1 {
   line-height: 1.4;
 }
 
-/* Slider y barra de fuerza a la derecha de la flecha */
+/* Slider y barra de fuerza más pequeña */
 .slider-container {
   position: absolute;
-  right: 10%; /* slider a la derecha de la flecha */
+  right: 10%;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -85,24 +85,24 @@ h1 {
 
 #sliderFuerza {
   -webkit-appearance: none;
-  width: 200px;
-  height: 12px;
+  width: 150px; /* más pequeño */
+  height: 10px; /* más delgado */
   background: #ccc;
   border-radius: 6px;
   outline: none;
   cursor: grab;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 #sliderFuerza::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 40px;
-  height: 40px;
+  width: 30px; /* más pequeño */
+  height: 30px; /* más pequeño */
   background: url('palanca.png') center/contain no-repeat;
   border-radius: 50%;
   cursor: grab;
-  margin-top: -14px;
+  margin-top: -10px;
 }
 
 #sliderFuerza:active::-webkit-slider-thumb {
@@ -112,8 +112,8 @@ h1 {
 
 .barra-fuerza {
   position: relative;
-  width: 200px;
-  height: 20px;
+  width: 150px; /* más pequeña */
+  height: 15px; /* más pequeña */
   background-color: #ddd;
   border-radius: 10px;
   border: 2px solid #aaa;
