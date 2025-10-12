@@ -71,10 +71,10 @@ h1 {
   line-height: 1.4;
 }
 
-/* Botón de girar rojo y redondo sin efecto */
+/* Botón de girar rojo, redondo y con efecto de brillo cuando se puede volver a pulsar */
 .boton-girar {
   position: absolute;
-  right: 29%;
+  right: 22%; /* un poquito separado de la flecha */
   top: 50%;
   transform: translateY(-50%);
   width: 80px;
@@ -89,7 +89,16 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: transform 0.2s, background-color 0.2s;
+  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.boton-girar.brilho {
+  animation: brillo 0.8s infinite alternate;
+}
+
+@keyframes brillo {
+  0% { box-shadow: 0 0 10px 2px rgba(255,0,0,0.5); }
+  100% { box-shadow: 0 0 25px 5px rgba(255,0,0,0.9); }
 }
 
 /* Botones y modal */
@@ -193,7 +202,10 @@ function animate(){
   rotation+=velocity;
   velocity*=0.985;
   drawRoulette();
-  if(velocity<0.001) spinning=false;
+  if(velocity<0.001){
+    spinning=false;
+    btnGirar.classList.add('brilho'); // al detenerse, el botón puede volver a pulsarse y brilla
+  }
   requestAnimationFrame(animate);
 }
 
@@ -201,8 +213,12 @@ const btnGirar=document.getElementById('btnGirar');
 let fuerza=0;
 let presionInterval;
 
+// Se puede hacer clic inmediatamente
+btnGirar.classList.add('brilho');
+
 btnGirar.addEventListener('mousedown',()=>{
   fuerza=0;
+  btnGirar.classList.remove('brilho'); // quita el brillo mientras se presiona
   presionInterval=setInterval(()=>{
     if(fuerza<100) fuerza+=2;
   },30);
