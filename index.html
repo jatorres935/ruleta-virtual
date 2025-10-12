@@ -71,10 +71,10 @@ h1 {
   line-height: 1.4;
 }
 
-/* Slider unificado como barra de fuerza (tamaño normal) */
+/* Slider vertical unificado */
 .slider-container {
   position: absolute;
-  right: 24%; /* Acercamos el slider a la flecha */
+  right: 21%; /* mantiene la posición sin tapar la flecha */
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -85,12 +85,13 @@ h1 {
 
 #sliderFuerza {
   -webkit-appearance: none;
-  width: 150px;
-  height: 12px;
-  background: linear-gradient(90deg, #28a745 0%, #28a745 0%, #ddd 0%, #ddd 100%);
+  width: 12px;       /* ancho del slider vertical */
+  height: 150px;     /* altura del slider vertical */
+  background: linear-gradient(#ddd 0%, #ddd 100%);
   border-radius: 6px;
   outline: none;
   cursor: grab;
+  writing-mode: bt-lr; /* convierte en vertical */
 }
 
 #sliderFuerza::-webkit-slider-thumb {
@@ -101,7 +102,7 @@ h1 {
   background: url('palanca.png') center/contain no-repeat;
   border-radius: 50%;
   cursor: grab;
-  margin-top: -24px;
+  margin-left: -24px;
   transition: transform 0.2s;
 }
 
@@ -225,7 +226,7 @@ const slider=document.getElementById('sliderFuerza');
 
 slider.addEventListener('input',()=>{
   fuerza=parseInt(slider.value);
-  slider.style.background=`linear-gradient(90deg, #28a745 0%, #28a745 ${fuerza}%, #ddd ${fuerza}%, #ddd 100%)`;
+  slider.style.background=`linear-gradient(#28a745 0%, #28a745 ${fuerza}%, #ddd ${fuerza}%, #ddd 100%)`;
   if(fuerza>=100) slider.classList.add('brillo');
   else slider.classList.remove('brillo');
 });
@@ -237,7 +238,7 @@ slider.addEventListener('change',()=>{
     animate();
     setTimeout(()=>{
       slider.value=0;
-      slider.style.background=`linear-gradient(90deg, #28a745 0%, #28a745 0%, #ddd 0%, #ddd 100%)`;
+      slider.style.background=`linear-gradient(#28a745 0%, #28a745 0%, #ddd 0%, #ddd 100%)`;
     },800);
   }
 });
