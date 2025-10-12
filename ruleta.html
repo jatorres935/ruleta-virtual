@@ -20,7 +20,7 @@ body {
 
 #ruleta {
   border-radius: 50%;
-  cursor: pointer;
+  cursor: grab;
   width: 80vw;
   max-width: 500px;
   height: auto;
@@ -37,15 +37,15 @@ body {
   transform: translate(-50%, -100%);
   width: 0;
   height: 0;
-  border-left: 15px solid transparent;
-  border-right: 15px solid transparent;
-  border-bottom: 60px solid black; /* Flecha más pequeña */
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 50px solid black; /* Flecha un poco más pequeña */
   z-index: 5;
 }
 
 .boton-girar {
   position: absolute;
-  bottom: 120px; /* separarlo de la ruleta */
+  bottom: 120px;
   left: 50%;
   transform: translateX(-50%);
   width: 100px;
@@ -195,6 +195,50 @@ window.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; }
 /* Boton volver al inicio */
 document.getElementById('btnVolver').addEventListener('click', () => {
   window.location.href = 'index.html';
+});
+
+/* Giro manual en móviles */
+let lastX, lastRotation = 0, isDragging = false;
+
+canvas.addEventListener('pointerdown', (e) => {
+  if(spinning) return;
+  isDragging = true;
+  lastX = e.clientX || e.touches?.[0]?.clientX;
+  lastRotation = rotation;
+  canvas.setPointerCapture(e.pointerId);
+});
+
+canvas.addEventListener('pointermove', (e) => {
+  if(!isDragging) return;
+  let x = e.clientX || e.touches?.[0]?.clientX;
+  let delta = (x - lastX)/100;
+  rotation = lastRotation + delta;
+  drawRoulette();
+});
+
+canvas.addEventListener('pointerup', (e) => {
+  if(!isDragging) return;
+  isDragging = false;
+  // Velocidad según último movimiento
+  let x = e.clientX || e.changedTouches?.[0]?.clientX;
+  velocity = (x - lastX)/30;
+  if(Math.abs(velocity) > 0.01){
+    spinning = true;
+    function animateManual(){
+      if(!spinning) return;
+      rotation += velocity;
+      velocity *= 0.98;
+      if(Math.abs(velocity) < 0.002){
+        spinning = false;
+        velocity = 0;
+        drawRoulette();
+        return;
+      }
+      drawRoulette();
+      requestAnimationFrame(animateManual);
+    }
+    animateManual();
+  }
 });
 </script>
 </body>
