@@ -71,10 +71,10 @@ h1 {
   line-height: 1.4;
 }
 
-/* Botón de girar rojo y redondo con efecto parpadeo */
+/* Botón de girar rojo y redondo sin efecto */
 .boton-girar {
   position: absolute;
-  right: 21%;
+  right: 29%;
   top: 50%;
   transform: translateY(-50%);
   width: 80px;
@@ -89,18 +89,7 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
-}
-
-.boton-girar:hover {
-  background-color: #c0392b;
-  transform: scale(1.1);
-  animation: brillo 0.5s infinite alternate;
-}
-
-@keyframes brillo {
-  0% { box-shadow: 0 0 5px 0 rgba(255,0,0,0.7); }
-  100% { box-shadow: 0 0 20px 5px rgba(255,0,0,1); }
+  transition: transform 0.2s, background-color 0.2s;
 }
 
 /* Botones y modal */
@@ -215,7 +204,7 @@ let presionInterval;
 btnGirar.addEventListener('mousedown',()=>{
   fuerza=0;
   presionInterval=setInterval(()=>{
-    if(fuerza<100) fuerza+=2; // aumenta fuerza mientras se mantiene presionado
+    if(fuerza<100) fuerza+=2;
   },30);
 });
 
@@ -223,8 +212,7 @@ btnGirar.addEventListener('mouseup',()=>{
   clearInterval(presionInterval);
   if(!spinning){
     spinning=true;
-    // convertir fuerza en velocidad
-    velocity=0.005*fuerza + 0.3; // mínimo 0.3, máximo ~0.8+
+    velocity=0.005*fuerza + 0.3;
     animate();
   }
 });
