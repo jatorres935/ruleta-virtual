@@ -18,14 +18,14 @@ body {
 
 h1 {
   margin-top: 20px;
-  font-size: 2em; /* más grande para énfasis */
+  font-size: 2em;
   text-align: center;
   padding: 0 10px;
 }
 
 h2 {
   margin-top: 10px;
-  font-size: 1.3em; /* subtítulo */
+  font-size: 1.3em;
   text-align: center;
   color: #333;
 }
@@ -53,24 +53,20 @@ h2 {
 
 .flecha {
   position: absolute;
-  right: 27%;
-  top: 50%;
+  z-index: 5;
   width: 0;
   height: 0;
-  border-top: 12px solid transparent; /* más grande */
+  border-top: 12px solid transparent;
   border-bottom: 12px solid transparent;
-  border-left: 90px solid black; /* más grande */
+  border-left: 90px solid black;
   transform: translateY(-50%) rotate(180deg);
-  z-index: 5;
 }
 
 .boton-girar {
   position: absolute;
-  right: 20%;
-  top: 50%;
   transform: translateY(-50%);
-  width: 100px; /* más grande */
-  height: 100px; /* más grande */
+  width: 100px;
+  height: 100px;
   background-color: #e74c3c;
   color: white;
   border: none;
@@ -112,15 +108,20 @@ h2 {
 
 @media (max-width:768px){
   .container{flex-direction:column; align-items:center;}
-  #ruleta{width:90vw; max-width:350px; max-height:60vh;}
+  h1{font-size:1.8em;}
+  h2{font-size:1.1em;}
+  #ruleta{
+    width:90vw;
+    max-width:350px;
+    max-height:60vh;
+  }
   .flecha{
-    position: relative;
-    top: -5px;
-    right: 0;
-    transform: rotate(90deg);
+    top: auto;
+    bottom: calc(50% - 20px);
+    right: 10%;
     border-left: none;
     border-right: 50px solid black;
-    margin-bottom: 10px;
+    transform: rotate(90deg);
   }
   .boton-girar{
     position: relative;
@@ -130,6 +131,16 @@ h2 {
     transform: none;
     width: 80px;
     height: 80px;
+  }
+}
+
+/* Ajuste dinámico de posición y tamaño */
+@media (min-width:769px){
+  .flecha{
+    right: calc(27% + ((100vw - 1200px)/2));
+  }
+  .boton-girar{
+    right: calc(20% + ((100vw - 1200px)/2));
   }
 }
 </style>
