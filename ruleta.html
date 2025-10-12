@@ -16,53 +16,53 @@ body {
   flex-direction: column;
   min-height: 100vh;
   position: relative;
+  overflow: hidden;
 }
 
-/* Contenedor principal */
 #container {
   position: relative;
   width: 90vw;
   max-width: 500px;
-  aspect-ratio: 1/1;
+  aspect-ratio: 1 / 1;
 }
 
-/* Ruleta centrada y proporcional */
+/* Ruleta circular y centrada */
 #ruleta {
-  border-radius: 50%;
   width: 100%;
   height: 100%;
-  cursor: grab;
+  border-radius: 50%;
   touch-action: none;
+  display: block;
 }
 
-/* Flecha proporcional */
+/* Flecha */
 .flecha {
   position: absolute;
-  top: -12%;
+  top: -30px;
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
-  border-left: 8% solid transparent;
-  border-right: 8% solid transparent;
-  border-bottom: 15% solid black;
-  z-index: 5;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-bottom: 40px solid black;
+  z-index: 10;
 }
 
-/* Botón Girar proporcional */
+/* Botón Girar */
 .boton-girar {
   position: absolute;
-  top: 5%;
-  left: 5%;
-  width: 18%;
-  aspect-ratio: 1/1;
+  top: -80px;
+  left: 10px;
+  width: 80px;
+  height: 80px;
   background-color: #e74c3c;
   color: white;
   border: none;
   border-radius: 50%;
   font-size: 1em;
   cursor: pointer;
-  z-index: 10;
+  z-index: 15;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -71,34 +71,34 @@ body {
 /* Botón Instrucciones */
 .boton-instrucciones {
   position: absolute;
-  bottom: 5%;
-  left: 5%;
+  bottom: 10px;
+  left: 10px;
   background-color: #28a745;
   border: none;
   color: white;
   font-size: 1em;
-  padding: 8px 16px;
+  padding: 10px 20px;
   border-radius: 8px;
   cursor: pointer;
-  z-index: 10;
+  z-index: 15;
 }
 
-/* Botón volver */
+/* Botón Volver */
 .boton-volver {
   position: absolute;
-  bottom: 5%;
-  right: 5%;
+  bottom: 10px;
+  right: 10px;
   background-color: #3498db;
   border: none;
   color: white;
   font-size: 1em;
-  padding: 8px 16px;
+  padding: 10px 20px;
   border-radius: 8px;
   cursor: pointer;
-  z-index: 10;
+  z-index: 15;
 }
 
-/* Modal instrucciones */
+/* Modal */
 .modal {
   display: flex;
   position: fixed;
@@ -128,16 +128,37 @@ body {
   font-weight: bold;
 }
 
-/* Ajustes para pantallas muy pequeñas */
-@media (max-width: 480px) {
+/* Ajuste en móviles verticales */
+@media (max-width: 600px) and (orientation: portrait) {
   .boton-girar {
-    width: 22%;
-    font-size: 0.9em;
+    top: auto;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 70px;
   }
   .flecha {
-    border-left: 10% solid transparent;
-    border-right: 10% solid transparent;
-    border-bottom: 20% solid black;
+    top: -25px;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 35px solid black;
+  }
+}
+
+/* Ajuste en móviles horizontales */
+@media (max-width: 900px) and (orientation: landscape) {
+  .boton-girar {
+    top: 10px;
+    left: 10px;
+    width: 60px;
+    height: 60px;
+  }
+  .flecha {
+    top: -20px;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 30px solid black;
   }
 }
 </style>
@@ -216,7 +237,7 @@ document.getElementById('btnVolver').addEventListener('click', () => {
   window.location.href = 'index.html';
 });
 
-/* Giro manual en móviles: solo mueve la ruleta */
+/* Giro manual sin impulso */
 let lastX, lastRotation = 0, isDragging = false;
 
 canvas.addEventListener('pointerdown', (e) => {
@@ -235,9 +256,7 @@ canvas.addEventListener('pointermove', (e) => {
   drawRoulette();
 });
 
-canvas.addEventListener('pointerup', (e) => {
-  isDragging = false; // No se genera impulso al soltar
-});
+canvas.addEventListener('pointerup', () => isDragging = false);
 </script>
 </body>
 </html>
