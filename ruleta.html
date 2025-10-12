@@ -150,12 +150,17 @@ body {
 const canvas = document.getElementById("ruleta");
 const ctx = canvas.getContext("2d");
 
+// Capas (externa al fondo, interna al frente)
 const capas = [
-  { src: "ruleta_externa.png", rotation: 0 },
-  { src: "ruleta_media.png", rotation: 0 },
-  { src: "ruleta_interna.png", rotation: 0 }
+  { src: "ruleta_externa.png", rotation: 0, img: null, buf: null, bctx: null },
+  { src: "ruleta_media.png",   rotation: 0, img: null, buf: null, bctx: null },
+  { src: "ruleta_interna.png", rotation: 0, img: null, buf: null, bctx: null }
 ];
 
+const DPR = Math.max(1, window.devicePixelRatio || 1);
+let baseW = 500, baseH = 500; // se sustituye por el tamaño real
+
+// Cargar imágenes
 let imagesLoaded = 0;
 capas.forEach(c => {
   const img = new Image();
@@ -164,27 +169,68 @@ capas.forEach(c => {
     c.img = img;
     imagesLoaded++;
     if (imagesLoaded === capas.length) {
-      // === FIX 1: usar tamaño real de los PNG para superposición exacta ===
-      const baseW = capas[0].img.naturalWidth;
-      const baseH = capas[0].img.naturalHeight;
-      canvas.width  = baseW;
-      canvas.height = baseH;
-      // ========================================
+      // 1) Usar tamaño real de la externa como base (asumiendo mismas dimensiones)
+      baseW = capas[0].img.naturalWidth;
+      baseH = capas[0].img.naturalHeight;
+
+      // 2) Canvas HiDPI para nitidez
+      canvas.width  = Math.round(baseW * DPR);
+      canvas.height = Math.round(baseH * DPR);
+      canvas.style.width  = baseW + "px";
+      canvas.style.height = baseH + "px";
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+      // 3) Buffers por capa (para hit-test de alpha)
+      capas.forEach(l => {
+        const b = document.createElement("canvas");
+        b.width = baseW; b.height = baseH;
+        const bctx = b.getContext("2d");
+        bctx.drawImage(l.img, 0, 0, baseW, baseH);
+        l.buf = b; l.bctx = bctx;
+      });
 
       drawAll();
     }
   };
 });
 
+// Dibuja todas las capas superpuestas y rotadas
 function drawAll() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  capas.forEach(c => {
+  ctx.clearRect(0, 0, baseW, baseH);
+  // Fondo -> frente: externa, media, interna
+  for (const c of capas) {
     ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.translate(baseW / 2, baseH / 2);
     ctx.rotate(c.rotation);
-    ctx.drawImage(c.img, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+    ctx.drawImage(c.img, -baseW / 2, -baseH / 2, baseW, baseH);
     ctx.restore();
-  });
+  }
+}
+
+/* === Selección de capa por alpha real (pixel-perfect) === */
+function pickLayerByAlpha(clientX, clientY) {
+  const rect = canvas.getBoundingClientRect();
+  // Pasar a coords internas del canvas corrigiendo escala CSS
+  const scale = baseW / rect.width;
+  const xCSS = (clientX - rect.left) * scale;
+  const yCSS = (clientY - rect.top)  * scale;
+
+  // Revisar de arriba hacia abajo: interna -> media -> externa
+  const order = [2, 1, 0];
+  for (const idx of order) {
+    const L = capas[idx];
+    const cx = baseW / 2, cy = baseH / 2;
+    // Transformar punto al espacio de la capa (rotación inversa)
+    const dx = xCSS - cx, dy = yCSS - cy;
+    const cos = Math.cos(-L.rotation), sin = Math.sin(-L.rotation);
+    const lx = cos * dx - sin * dy + cx;
+    const ly = sin * dx + cos * dy + cy;
+
+    if (lx < 0 || ly < 0 || lx >= baseW || ly >= baseH) continue;
+    const a = L.bctx.getImageData(lx | 0, ly | 0, 1, 1).data[3];
+    if (a > 5) return L; // pixel visible -> capa elegida
+  }
+  return null;
 }
 
 /* Interacción independiente por capa */
@@ -193,32 +239,27 @@ let startAngle = 0;
 let startRotation = 0;
 
 canvas.addEventListener("pointerdown", e => {
+  activeLayer = pickLayerByAlpha(e.clientX, e.clientY);
+  if (!activeLayer) return;
+
+  canvas.setPointerCapture(e.pointerId);
+
   const rect = canvas.getBoundingClientRect();
+  const scale = baseW / rect.width;
+  const x = (e.clientX - rect.left) * scale - baseW / 2;
+  const y = (e.clientY - rect.top)  * scale - baseH / 2;
 
-  // === FIX 2: convertir puntero a coordenadas del canvas (corrigiendo escala CSS) ===
-  const scale = canvas.width / rect.width; // mismo para X/Y por mantener aspect-ratio
-  const x = (e.clientX - rect.left) * scale - canvas.width / 2;
-  const y = (e.clientY - rect.top)  * scale - canvas.height / 2;
-  // ========================================
-
-  const r = Math.sqrt(x * x + y * y);
-  const layerWidth = canvas.width / 6; // tu regla original
-  let index = Math.min(2, Math.floor(r / layerWidth));
-  activeLayer = capas[2 - index];
   startAngle = Math.atan2(y, x);
   startRotation = activeLayer.rotation;
-  canvas.setPointerCapture(e.pointerId);
 });
 
 canvas.addEventListener("pointermove", e => {
   if (!activeLayer) return;
-  const rect = canvas.getBoundingClientRect();
 
-  // === FIX 2 aplicado también aquí ===
-  const scale = canvas.width / rect.width;
-  const x = (e.clientX - rect.left) * scale - canvas.width / 2;
-  const y = (e.clientY - rect.top)  * scale - canvas.height / 2;
-  // ===================================
+  const rect = canvas.getBoundingClientRect();
+  const scale = baseW / rect.width;
+  const x = (e.clientX - rect.left) * scale - baseW / 2;
+  const y = (e.clientY - rect.top)  * scale - baseH / 2;
 
   const angle = Math.atan2(y, x);
   const delta = angle - startAngle;
@@ -226,8 +267,9 @@ canvas.addEventListener("pointermove", e => {
   drawAll();
 });
 
-canvas.addEventListener("pointerup", () => activeLayer = null);
-canvas.addEventListener("pointerleave", () => activeLayer = null);
+function endDrag() { activeLayer = null; }
+canvas.addEventListener("pointerup", endDrag);
+canvas.addEventListener("pointerleave", endDrag);
 
 /* === Botones === */
 const btnInstrucciones = document.getElementById('btnInstrucciones');
@@ -238,6 +280,23 @@ window.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; }
 
 document.getElementById("btnVolver").addEventListener("click", () => {
   window.location.href = "index.html";
+});
+
+/* (Opcional) Botón Girar: si lo mantienes, ahora gira todo (puedo cambiarlo a capa activa si prefieres) */
+document.getElementById("btnGirar").addEventListener("click", () => {
+  const dur = 1200, spins = Math.PI * 2 * 1.5;
+  const start = performance.now();
+  const startRots = capas.map(c => c.rotation);
+  const ease = t => 1 - Math.pow(1 - t, 3);
+
+  function frame(now) {
+    const t = Math.min(1, (now - start) / dur);
+    const delta = ease(t) * spins;
+    capas.forEach((c, i) => c.rotation = startRots[i] + delta);
+    drawAll();
+    if (t < 1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 });
 </script>
 
