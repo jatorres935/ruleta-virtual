@@ -71,48 +71,24 @@ h1 {
   line-height: 1.4;
 }
 
-/* Slider vertical unificado */
-.slider-container {
+.boton-girar {
   position: absolute;
-  right: 21%; /* mantiene la posición sin tapar la flecha */
+  right: 21%; /* cerca de la flecha */
   top: 50%;
   transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  padding: 15px 25px;
+  font-size: 1em;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
   z-index: 10;
+  transition: 0.3s;
 }
 
-#sliderFuerza {
-  -webkit-appearance: none;
-  width: 12px;       /* ancho del slider vertical */
-  height: 150px;     /* altura del slider vertical */
-  background: linear-gradient(#ddd 0%, #ddd 100%);
-  border-radius: 6px;
-  outline: none;
-  cursor: grab;
-  writing-mode: bt-lr; /* convierte en vertical */
-}
-
-#sliderFuerza::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 60px;
-  height: 60px;
-  background: url('palanca.png') center/contain no-repeat;
-  border-radius: 50%;
-  cursor: grab;
-  margin-left: -24px;
-  transition: transform 0.2s;
-}
-
-#sliderFuerza:active::-webkit-slider-thumb {
-  transform: scale(1.1);
-  cursor: grabbing;
-}
-
-.brillo {
-  box-shadow: 0 0 15px 4px rgba(0,255,100,0.8);
+.boton-girar:hover {
+  background-color: #1e7e34;
 }
 
 /* Botones y modal */
@@ -169,7 +145,7 @@ h1 {
   .texto-lateral{position:relative;left:0;top:0;transform:none;text-align:center;width:90%;}
   #ruleta{width:80vw;max-width:400px;}
   .flecha{position:relative;top:-10px;transform:rotate(90deg);border-left:none;border-right:40px solid black;}
-  .slider-container { position: relative; top: 10px; right: 0; transform: none; }
+  .boton-girar { position: relative; top: 10px; right: 0; transform: none; }
 }
 </style>
 </head>
@@ -186,9 +162,7 @@ h1 {
   <canvas id="ruleta" width="500" height="500"></canvas>
   <div class="flecha"></div>
 
-  <div class="slider-container">
-    <input type="range" id="sliderFuerza" min="0" max="100" value="0">
-  </div>
+  <button class="boton-girar" id="btnGirar">Girar</button>
 </div>
 
 <div id="modal" class="modal">
@@ -201,7 +175,7 @@ const canvas=document.getElementById('ruleta');
 const ctx=canvas.getContext('2d');
 const img=new Image();
 img.src='ruleta.png';
-let rotation=0, spinning=false, velocity=0, fuerza=0;
+let rotation=0, spinning=false, velocity=0;
 img.onload=()=>drawRoulette();
 
 function drawRoulette(){
@@ -222,24 +196,12 @@ function animate(){
   requestAnimationFrame(animate);
 }
 
-const slider=document.getElementById('sliderFuerza');
-
-slider.addEventListener('input',()=>{
-  fuerza=parseInt(slider.value);
-  slider.style.background=`linear-gradient(#28a745 0%, #28a745 ${fuerza}%, #ddd ${fuerza}%, #ddd 100%)`;
-  if(fuerza>=100) slider.classList.add('brillo');
-  else slider.classList.remove('brillo');
-});
-
-slider.addEventListener('change',()=>{
-  if(!spinning && fuerza>0){
+const btnGirar=document.getElementById('btnGirar');
+btnGirar.addEventListener('click',()=>{
+  if(!spinning){
     spinning=true;
-    velocity=(fuerza/100)*0.5;
+    velocity=Math.random()*0.5+0.2; // fuerza aleatoria
     animate();
-    setTimeout(()=>{
-      slider.value=0;
-      slider.style.background=`linear-gradient(#28a745 0%, #28a745 0%, #ddd 0%, #ddd 100%)`;
-    },800);
   }
 });
 
