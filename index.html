@@ -44,7 +44,7 @@ h1 {
 
 .flecha {
   position: absolute;
-  right: 29%;
+  right: 35%;
   top: 50%;
   width: 0;
   height: 0;
@@ -71,10 +71,12 @@ h1 {
   line-height: 1.4;
 }
 
-/* Slider y barra de fuerza horizontal */
+/* Slider y barra de fuerza a la derecha de la flecha */
 .slider-container {
   position: absolute;
-  bottom: 50px; /* debajo de la ruleta */
+  right: 10%;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -83,13 +85,13 @@ h1 {
 
 #sliderFuerza {
   -webkit-appearance: none;
-  width: 300px;
+  width: 200px;
   height: 12px;
   background: #ccc;
   border-radius: 6px;
   outline: none;
   cursor: grab;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 #sliderFuerza::-webkit-slider-thumb {
@@ -100,7 +102,7 @@ h1 {
   background: url('palanca.png') center/contain no-repeat;
   border-radius: 50%;
   cursor: grab;
-  margin-top: -14px; /* centrar verticalmente */
+  margin-top: -14px;
 }
 
 #sliderFuerza:active::-webkit-slider-thumb {
@@ -110,7 +112,7 @@ h1 {
 
 .barra-fuerza {
   position: relative;
-  width: 300px;
+  width: 200px;
   height: 20px;
   background-color: #ddd;
   border-radius: 10px;
@@ -191,7 +193,7 @@ h1 {
   .texto-lateral{position:relative;left:0;top:0;transform:none;text-align:center;width:90%;}
   #ruleta{width:80vw;max-width:400px;}
   .flecha{position:relative;top:-10px;transform:rotate(90deg);border-left:none;border-right:40px solid black;}
-  .slider-container { bottom: 20px; }
+  .slider-container { position: relative; top: 10px; right: 0; transform: none; }
 }
 </style>
 </head>
