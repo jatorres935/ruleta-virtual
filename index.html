@@ -71,59 +71,25 @@ h1 {
   line-height: 1.4;
 }
 
-/* Barra + palanca */
-.barra-slider-container {
+/* Slider y barra de fuerza horizontal */
+.slider-container {
   position: absolute;
-  right: 27%;
-  top: 50%;
-  transform: translateY(-50%);
+  bottom: 50px; /* debajo de la ruleta */
   display: flex;
   flex-direction: column;
   align-items: center;
   z-index: 10;
 }
 
-.barra-fuerza {
-  position: relative;
-  width: 20px;
-  height: 120px;
-  background-color: #ddd;
-  border-radius: 10px;
-  border: 2px solid #aaa;
-  overflow: hidden;
-  margin-bottom: 10px;
-}
-
-.nivel-fuerza {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 0%;
-  background: linear-gradient(180deg, #28a745, #00ff66);
-  transition: height 0.2s linear;
-}
-
-.palanca-movil {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%) rotate(0deg);
-  width: 40px;
-  height: 40px;
-  background: url('palanca.png') center/contain no-repeat;
-  pointer-events: none;
-  transition: bottom 0.2s ease, transform 0.2s ease;
-}
-
 #sliderFuerza {
   -webkit-appearance: none;
-  width: 150px;
+  width: 300px;
   height: 12px;
   background: #ccc;
   border-radius: 6px;
   outline: none;
-  cursor: pointer;
+  cursor: grab;
+  margin-bottom: 20px;
 }
 
 #sliderFuerza::-webkit-slider-thumb {
@@ -142,6 +108,26 @@ h1 {
   cursor: grabbing;
 }
 
+.barra-fuerza {
+  position: relative;
+  width: 300px;
+  height: 20px;
+  background-color: #ddd;
+  border-radius: 10px;
+  border: 2px solid #aaa;
+  overflow: hidden;
+}
+
+.nivel-fuerza {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #28a745, #00ff66);
+  transition: width 0.2s linear;
+}
+
 .brillo {
   animation: pulse 0.5s infinite alternate;
   box-shadow: 0 0 20px 5px rgba(0,255,100,0.9);
@@ -150,14 +136,6 @@ h1 {
 @keyframes pulse {
   0% { box-shadow: 0 0 10px 2px rgba(0,255,100,0.5); }
   100% { box-shadow: 0 0 25px 5px rgba(0,255,100,0.8); }
-}
-
-canvas#confeti {
-  position: fixed;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: 1000;
 }
 
 .boton-instrucciones {
@@ -213,7 +191,7 @@ canvas#confeti {
   .texto-lateral{position:relative;left:0;top:0;transform:none;text-align:center;width:90%;}
   #ruleta{width:80vw;max-width:400px;}
   .flecha{position:relative;top:-10px;transform:rotate(90deg);border-left:none;border-right:40px solid black;}
-  .barra-slider-container{position:relative;right:0;top:0;transform:none;}
+  .slider-container { bottom: 20px; }
 }
 </style>
 </head>
@@ -230,12 +208,11 @@ canvas#confeti {
   <canvas id="ruleta" width="500" height="500"></canvas>
   <div class="flecha"></div>
 
-  <div class="barra-slider-container">
+  <div class="slider-container">
+    <input type="range" id="sliderFuerza" min="0" max="100" value="0">
     <div class="barra-fuerza" id="barraFuerza">
       <div class="nivel-fuerza" id="nivelFuerza"></div>
-      <div class="palanca-movil" id="palancaMovil"></div>
     </div>
-    <input type="range" id="sliderFuerza" min="0" max="100" value="0">
   </div>
 </div>
 
@@ -244,8 +221,6 @@ canvas#confeti {
   <img id="imagenAmpliada" src="Instrucciones.png" alt="Instrucciones ampliadas">
 </div>
 
-<canvas id="confeti"></canvas>
-
 <script>
 const canvas=document.getElementById('ruleta');
 const ctx=canvas.getContext('2d');
@@ -253,6 +228,7 @@ const img=new Image();
 img.src='ruleta.png';
 let rotation=0, spinning=false, velocity=0, fuerza=0;
 img.onload=()=>drawRoulette();
+
 function drawRoulette(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.save();
@@ -266,27 +242,17 @@ function animate(){
   if(!spinning) return;
   rotation+=velocity;
   velocity*=0.98;
-  if(velocity>0.01){
-    palancaMovil.style.transform=`translateX(-50%) rotate(${Math.sin(rotation*5)*10}deg)`;
-  }
-  if(velocity<0.002){
-    spinning=false;
-    palancaMovil.style.transform='translateX(-50%) rotate(0deg)';
-    launchConfetti();
-  }
   drawRoulette();
+  if(velocity<0.002) spinning=false;
   requestAnimationFrame(animate);
 }
 
 const slider=document.getElementById('sliderFuerza');
 const nivelFuerza=document.getElementById('nivelFuerza');
-const palancaMovil=document.getElementById('palancaMovil');
 
 slider.addEventListener('input',()=>{
   fuerza=parseInt(slider.value);
-  nivelFuerza.style.height=fuerza+'%';
-  palancaMovil.style.bottom=fuerza+'%';
-  palancaMovil.style.transform=`translateX(-50%) rotate(${fuerza*1.2}deg)`;
+  nivelFuerza.style.width=fuerza+'%';
   if(fuerza>=100) nivelFuerza.classList.add('brillo');
   else nivelFuerza.classList.remove('brillo');
 });
@@ -298,56 +264,10 @@ slider.addEventListener('change',()=>{
     animate();
     setTimeout(()=>{
       slider.value=0;
-      nivelFuerza.style.height='0%';
-      palancaMovil.style.bottom='0%';
-      palancaMovil.style.transform='translateX(-50%) rotate(0deg)';
+      nivelFuerza.style.width='0%';
     },800);
   }
 });
-
-/* Confeti */
-const confetiCanvas=document.getElementById('confeti');
-const cctx=confetiCanvas.getContext('2d');
-confetiCanvas.width=window.innerWidth;
-confetiCanvas.height=window.innerHeight;
-window.addEventListener('resize',()=>{
-  confetiCanvas.width=window.innerWidth;
-  confetiCanvas.height=window.innerHeight;
-});
-
-function launchConfetti(){
-  const particles=[];
-  const colors=['#ff0','#0f0','#f0f','#0ff','#f00','#00f'];
-  for(let i=0;i<200;i++){
-    particles.push({
-      x:Math.random()*confetiCanvas.width,
-      y:Math.random()*confetiCanvas.height-confetiCanvas.height,
-      size:Math.random()*8+4,
-      color:colors[Math.floor(Math.random()*colors.length)],
-      speed:Math.random()*4+2,
-      angle:Math.random()*2*Math.PI,
-      rotation:Math.random()*360,
-      rotationSpeed:Math.random()*0.2-0.1
-    });
-  }
-  let duration=200;
-  function drawConfetti(){
-    cctx.clearRect(0,0,confetiCanvas.width,confetiCanvas.height);
-    particles.forEach(p=>{
-      p.y+=p.speed;
-      p.x+=Math.sin(p.angle);
-      p.rotation+=p.rotationSpeed;
-      cctx.save();
-      cctx.translate(p.x,p.y);
-      cctx.rotate(p.rotation);
-      cctx.fillStyle=p.color;
-      cctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
-      cctx.restore();
-    });
-    if(duration-->0) requestAnimationFrame(drawConfetti);
-  }
-  drawConfetti();
-}
 
 /* Modal */
 const modal=document.getElementById('modal');
