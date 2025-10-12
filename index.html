@@ -53,17 +53,21 @@ h2 {
 
 .flecha {
   position: absolute;
-  z-index: 5;
+  right: 27%;
+  top: 50%;
   width: 0;
   height: 0;
   border-top: 12px solid transparent;
   border-bottom: 12px solid transparent;
   border-left: 90px solid black;
   transform: translateY(-50%) rotate(180deg);
+  z-index: 5;
 }
 
 .boton-girar {
   position: absolute;
+  right: 20%;
+  top: 50%;
   transform: translateY(-50%);
   width: 100px;
   height: 100px;
@@ -116,12 +120,13 @@ h2 {
     max-height:60vh;
   }
   .flecha{
-    top: auto;
-    bottom: calc(50% - 20px);
-    right: 10%;
+    position: relative;
+    top: -5px;
+    right: 0;
+    transform: rotate(90deg);
     border-left: none;
     border-right: 50px solid black;
-    transform: rotate(90deg);
+    margin-bottom: 10px;
   }
   .boton-girar{
     position: relative;
@@ -131,16 +136,6 @@ h2 {
     transform: none;
     width: 80px;
     height: 80px;
-  }
-}
-
-/* Ajuste dinámico de posición y tamaño */
-@media (min-width:769px){
-  .flecha{
-    right: calc(27% + ((100vw - 1200px)/2));
-  }
-  .boton-girar{
-    right: calc(20% + ((100vw - 1200px)/2));
   }
 }
 </style>
