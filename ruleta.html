@@ -18,10 +18,11 @@ body {
   position: relative;
 }
 
+/* Ruleta centrada y grande */
 #ruleta {
   border-radius: 50%;
   cursor: grab;
-  width: 80vw;
+  width: 90vw;
   max-width: 500px;
   height: auto;
   aspect-ratio: 1/1;
@@ -43,9 +44,10 @@ body {
   z-index: 5;
 }
 
+/* Botones */
 .boton-girar {
   position: absolute;
-  bottom: 120px;
+  bottom: 60px;
   left: 50%;
   transform: translateX(-50%);
   width: 100px;
@@ -90,6 +92,7 @@ body {
   z-index: 10;
 }
 
+/* Modal instrucciones */
 .modal {
   display: flex;
   position: fixed;
@@ -119,15 +122,16 @@ body {
   font-weight: bold;
 }
 
+/* Ajustes responsive */
 @media (max-width:768px){
   .boton-girar {
-    bottom: auto;
-    left: auto;
-    right: 10px; /* Mueve el botón girar a la derecha en móvil */
-    top: 50%;
-    transform: translateY(-50%);
     width: 80px;
     height: 80px;
+    bottom: auto;
+    top: 50%;
+    right: 10px;
+    left: auto;
+    transform: translateY(-50%);
   }
 }
 </style>
@@ -205,7 +209,7 @@ document.getElementById('btnVolver').addEventListener('click', () => {
   window.location.href = 'index.html';
 });
 
-/* Giro manual en móviles: solo mueve la ruleta, no genera impulso */
+/* Giro manual en móviles: solo mueve la ruleta */
 let lastX, lastRotation = 0, isDragging = false;
 
 canvas.addEventListener('pointerdown', (e) => {
