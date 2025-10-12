@@ -18,10 +18,11 @@ body {
   position: relative;
 }
 
+/* Ruleta centrada y perfectamente redonda */
 #ruleta {
   border-radius: 50%;
-  cursor: pointer;
-  width: 80vw;
+  cursor: grab;
+  width: 90vw;
   max-width: 500px;
   height: auto;
   aspect-ratio: 1/1;
@@ -37,19 +38,19 @@ body {
   transform: translate(-50%, -100%);
   width: 0;
   height: 0;
-  border-left: 20px solid transparent;
-  border-right: 20px solid transparent;
-  border-bottom: 80px solid black;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 50px solid black;
   z-index: 5;
 }
 
+/* Botones */
 .boton-girar {
   position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100px;
-  height: 100px;
+  top: 20px;
+  left: 20px;
+  width: 90px;
+  height: 90px;
   background-color: #e74c3c;
   color: white;
   border: none;
@@ -76,8 +77,23 @@ body {
   z-index: 10;
 }
 
+.boton-volver {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: #3498db;
+  border: none;
+  color: white;
+  font-size: 1em;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* Modal instrucciones */
 .modal {
-  display: none;
+  display: flex;
   position: fixed;
   z-index: 100;
   left: 0;
@@ -110,8 +126,10 @@ body {
 
 <canvas id="ruleta" width="500" height="500"></canvas>
 <div class="flecha"></div>
+
 <button class="boton-girar" id="btnGirar">Girar</button>
 <button class="boton-instrucciones" id="btnInstrucciones">Instrucciones</button>
+<button class="boton-volver" id="btnVolver">Inicio</button>
 
 <div id="modal" class="modal">
   <span id="cerrar" class="cerrar">&times;</span>
@@ -171,6 +189,34 @@ const modal = document.getElementById('modal');
 btnInstrucciones.addEventListener('click', () => modal.style.display = 'flex');
 document.getElementById('cerrar').onclick = () => modal.style.display = 'none';
 window.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; };
+
+/* Boton volver al inicio */
+document.getElementById('btnVolver').addEventListener('click', () => {
+  window.location.href = 'index.html';
+});
+
+/* Giro manual en móviles: solo mueve la ruleta */
+let lastX, lastRotation = 0, isDragging = false;
+
+canvas.addEventListener('pointerdown', (e) => {
+  if(spinning) return;
+  isDragging = true;
+  lastX = e.clientX || e.touches?.[0]?.clientX;
+  lastRotation = rotation;
+  canvas.setPointerCapture(e.pointerId);
+});
+
+canvas.addEventListener('pointermove', (e) => {
+  if(!isDragging) return;
+  let x = e.clientX || e.touches?.[0]?.clientX;
+  let delta = (x - lastX)/100;
+  rotation = lastRotation + delta;
+  drawRoulette();
+});
+
+canvas.addEventListener('pointerup', (e) => {
+  isDragging = false; // No se genera impulso al soltar
+});
 </script>
 </body>
 </html>
