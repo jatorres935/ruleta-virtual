@@ -18,7 +18,7 @@ body {
   position: relative;
 }
 
-/* Ruleta centrada y grande */
+/* Ruleta centrada y perfectamente redonda */
 #ruleta {
   border-radius: 50%;
   cursor: grab;
@@ -47,11 +47,10 @@ body {
 /* Botones */
 .boton-girar {
   position: absolute;
-  bottom: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100px;
-  height: 100px;
+  top: 20px;
+  left: 20px;
+  width: 90px;
+  height: 90px;
   background-color: #e74c3c;
   color: white;
   border: none;
@@ -120,30 +119,6 @@ body {
   color: white;
   cursor: pointer;
   font-weight: bold;
-}
-
-/* Ajustes responsive solo para el botón girar */
-@media (max-width:768px){
-  /* Vertical: arriba de la ruleta */
-  @media (orientation: portrait) {
-    .boton-girar {
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80px;
-      height: 80px;
-    }
-  }
-  /* Horizontal: esquina superior izquierda */
-  @media (orientation: landscape) {
-    .boton-girar {
-      top: 20px;
-      left: 20px;
-      transform: none;
-      width: 80px;
-      height: 80px;
-    }
-  }
 }
 </style>
 </head>
