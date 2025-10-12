@@ -40,6 +40,7 @@ h1 {
   height: auto;
   position: relative;
   z-index: 1;
+  touch-action: none; /* importante para manejo táctil */
 }
 
 .flecha {
@@ -151,7 +152,7 @@ h1 {
 @media (max-width:768px){
   .container{flex-direction:column;}
   .texto-lateral{position:relative;left:0;top:0;transform:none;text-align:center;width:90%;}
-  #ruleta{width:80vw;max-width:400px;}
+  #ruleta{width:90vw;max-width:400px;}
   .flecha{position:relative;top:-10px;transform:rotate(90deg);border-left:none;border-right:40px solid black;}
   .boton-girar { position: relative; top: 10px; right: 0; transform: none; }
 }
@@ -198,43 +199,34 @@ function drawRoulette(){
 const btnGirar = document.getElementById('btnGirar');
 btnGirar.classList.add('brilho');
 
+// Botón rojo
 btnGirar.addEventListener('click', () => {
   if(spinning) return;
   btnGirar.classList.remove('brilho');
 
   spinning = true;
 
-  // Velocidad inicial muy aleatoria (ahora con posibilidad de giro extra largo)
-  let baseVelocity = Math.random() * 1.2 + 0.3; // entre 0.3 y 1.5
-  let extraChance = Math.random();
-  if(extraChance < 0.25){ // 25% de probabilidad de giro extra largo
-    velocity = baseVelocity + Math.random() * 2 + 1; // añade 1 a 3 de velocidad extra
-  } else {
-    velocity = baseVelocity;
-  }
+  // Velocidad inicial aleatoria con giro extra posible
+  let baseVelocity = Math.random() * 1.2 + 0.3;
+  if(Math.random() < 0.25) baseVelocity += Math.random()*2 + 1;
+  velocity = baseVelocity;
 
-  // Número de vueltas aleatorio
-  const vueltas = Math.random() * 7 + 3; // entre 3 y 10 vueltas
+  const vueltas = Math.random() * 7 + 3;
 
-  // Dividimos la ruleta en 8 segmentos
   const segmentos = 8;
   let segment;
-  do {
-    segment = Math.floor(Math.random() * segmentos);
-  } while(segment === lastSegment); // asegurar que no repita segmento
+  do { segment = Math.floor(Math.random() * segmentos); } 
+  while(segment === lastSegment);
   lastSegment = segment;
 
-  // Ángulo final dentro del segmento
   const anglePerSegment = 2*Math.PI / segmentos;
   const offset = Math.random() * anglePerSegment;
-  const metaRotation = rotation + vueltas * 2*Math.PI + segment*anglePerSegment + offset;
+  const metaRotation = rotation + vueltas*2*Math.PI + segment*anglePerSegment + offset;
 
   function animateSpin(){
     if(!spinning) return;
-
     rotation += velocity;
-    velocity *= 0.985; // desaceleración progresiva
-
+    velocity *= 0.985;
     if(velocity < 0.002){
       spinning = false;
       velocity = 0;
@@ -242,12 +234,49 @@ btnGirar.addEventListener('click', () => {
       btnGirar.classList.add('brilho');
       return;
     }
-
     drawRoulette();
     requestAnimationFrame(animateSpin);
   }
-
   animateSpin();
+});
+
+/* Giro manual por impulso táctil */
+let touchStartY = 0;
+let touchStartTime = 0;
+
+canvas.addEventListener('touchstart', (e)=>{
+  if(spinning) return;
+  const touch = e.touches[0];
+  touchStartY = touch.clientY;
+  touchStartTime = Date.now();
+});
+
+canvas.addEventListener('touchend', (e)=>{
+  if(spinning) return;
+  const touch = e.changedTouches[0];
+  const deltaY = touchStartY - touch.clientY;
+  const deltaTime = (Date.now() - touchStartTime)/1000;
+  const speed = deltaY/deltaTime * 0.0005; // factor de impulso
+  if(Math.abs(speed) > 0.001){ // mínimo impulso para activarse
+    velocity = Math.min(Math.max(Math.abs(speed),0.2),3); // limita velocidad
+    spinning = true;
+
+    function animateTouchSpin(){
+      if(!spinning) return;
+      rotation += velocity;
+      velocity *= 0.985;
+      if(velocity < 0.002){
+        spinning = false;
+        velocity = 0;
+        drawRoulette();
+        btnGirar.classList.add('brilho');
+        return;
+      }
+      drawRoulette();
+      requestAnimationFrame(animateTouchSpin);
+    }
+    animateTouchSpin();
+  }
 });
 
 /* Modal */
