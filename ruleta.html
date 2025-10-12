@@ -164,13 +164,12 @@ capas.forEach(c => {
     c.img = img;
     imagesLoaded++;
     if (imagesLoaded === capas.length) {
-      // === NUEVO (único cambio funcional): usar el tamaño real de tus PNG ===
-      // (asumiendo que los 3 tienen el mismo tamaño)
+      // === FIX 1: usar tamaño real de los PNG para superposición exacta ===
       const baseW = capas[0].img.naturalWidth;
       const baseH = capas[0].img.naturalHeight;
-      canvas.width = baseW;
+      canvas.width  = baseW;
       canvas.height = baseH;
-      // ================================================================
+      // ========================================
 
       drawAll();
     }
@@ -195,10 +194,15 @@ let startRotation = 0;
 
 canvas.addEventListener("pointerdown", e => {
   const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left - canvas.width / 2;
-  const y = e.clientY - rect.top - canvas.height / 2;
+
+  // === FIX 2: convertir puntero a coordenadas del canvas (corrigiendo escala CSS) ===
+  const scale = canvas.width / rect.width; // mismo para X/Y por mantener aspect-ratio
+  const x = (e.clientX - rect.left) * scale - canvas.width / 2;
+  const y = (e.clientY - rect.top)  * scale - canvas.height / 2;
+  // ========================================
+
   const r = Math.sqrt(x * x + y * y);
-  const layerWidth = canvas.width / 6;
+  const layerWidth = canvas.width / 6; // tu regla original
   let index = Math.min(2, Math.floor(r / layerWidth));
   activeLayer = capas[2 - index];
   startAngle = Math.atan2(y, x);
@@ -209,8 +213,13 @@ canvas.addEventListener("pointerdown", e => {
 canvas.addEventListener("pointermove", e => {
   if (!activeLayer) return;
   const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left - canvas.width / 2;
-  const y = e.clientY - rect.top - canvas.height / 2;
+
+  // === FIX 2 aplicado también aquí ===
+  const scale = canvas.width / rect.width;
+  const x = (e.clientX - rect.left) * scale - canvas.width / 2;
+  const y = (e.clientY - rect.top)  * scale - canvas.height / 2;
+  // ===================================
+
   const angle = Math.atan2(y, x);
   const delta = angle - startAngle;
   activeLayer.rotation = startRotation + delta;
