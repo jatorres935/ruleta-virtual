@@ -122,16 +122,27 @@ body {
   font-weight: bold;
 }
 
-/* Ajustes responsive */
+/* Ajustes responsive solo para el botón girar */
 @media (max-width:768px){
-  .boton-girar {
-    width: 80px;
-    height: 80px;
-    bottom: auto;
-    top: 50%;
-    right: 10px;
-    left: auto;
-    transform: translateY(-50%);
+  /* Vertical: arriba de la ruleta */
+  @media (orientation: portrait) {
+    .boton-girar {
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 80px;
+    }
+  }
+  /* Horizontal: esquina superior izquierda */
+  @media (orientation: landscape) {
+    .boton-girar {
+      top: 20px;
+      left: 20px;
+      transform: none;
+      width: 80px;
+      height: 80px;
+    }
   }
 }
 </style>
