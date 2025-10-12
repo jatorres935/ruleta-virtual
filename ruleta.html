@@ -90,7 +90,7 @@ body {
 const canvas = document.getElementById("ruleta");
 const ctx = canvas.getContext("2d");
 
-// Usa aquí los nombres de TUS PNG alineados (interno/medio/externo)
+// Usa aquí los nombres de TUS PNG alineados
 const capas = [
   { src: "ruleta_externa.png", rotation: 0, img:null, buf:null, bctx:null },
   { src: "ruleta_media.png",   rotation: 0, img:null, buf:null, bctx:null },
@@ -113,18 +113,14 @@ capas.forEach(c => {
 });
 
 function init(){
-  // 1) Tamaño real de imágenes (asumimos mismas dimensiones)
   baseW = capas[0].img.naturalWidth;
   baseH = capas[0].img.naturalHeight;
-
-  // 2) Canvas HiDPI (nitidez) + CSS responsivo conservado
   canvas.width  = Math.round(baseW * DPR);
   canvas.height = Math.round(baseH * DPR);
   canvas.style.width  = baseW + "px";
   canvas.style.height = baseH + "px";
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
-  // 3) Buffers por capa para leer alpha (hit-test exacto)
   capas.forEach(c => {
     const b = document.createElement("canvas");
     b.width = baseW; b.height = baseH;
@@ -138,7 +134,6 @@ function init(){
 
 function drawAll(){
   ctx.clearRect(0, 0, baseW, baseH);
-  // Externa (fondo) -> Media -> Interna (frente)
   for (const c of capas) {
     ctx.save();
     ctx.translate(baseW/2, baseH/2);
@@ -148,18 +143,15 @@ function drawAll(){
   }
 }
 
-// Devuelve la capa tocada según alpha real (recorremos de arriba hacia abajo)
 function pickLayer(clientX, clientY){
   const rect = canvas.getBoundingClientRect();
-  const scale = baseW / rect.width; // corrige escala CSS
+  const scale = baseW / rect.width;
   const x = (clientX - rect.left) * scale;
   const y = (clientY - rect.top)  * scale;
-
-  const order = [2,1,0]; // interna, media, externa
+  const order = [2,1,0];
   for (const idx of order){
     const L = capas[idx];
     const cx = baseW/2, cy = baseH/2;
-    // rotación inversa para muestrear en el buffer plano
     const dx = x - cx, dy = y - cy;
     const cos = Math.cos(-L.rotation), sin = Math.sin(-L.rotation);
     const lx = cos*dx - sin*dy + cx;
@@ -178,7 +170,6 @@ canvas.addEventListener("pointerdown", e => {
   activeLayer = pickLayer(e.clientX, e.clientY);
   if (!activeLayer) return;
   canvas.setPointerCapture(e.pointerId);
-
   const rect = canvas.getBoundingClientRect();
   const scale = baseW / rect.width;
   const x = (e.clientX - rect.left) * scale - baseW/2;
@@ -208,19 +199,33 @@ document.getElementById('cerrar').onclick = () => modal.style.display = 'none';
 window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
 document.getElementById("btnVolver").addEventListener("click", () => { window.location.href = "index.html"; });
 
-/* Botón Girar (global). Si quieres, lo cambio a “girar capa activa”. */
+/* === Botón Girar: tres anillos giran con velocidades y sentidos distintos === */
 document.getElementById("btnGirar").addEventListener("click", () => {
-  const dur = 1200, vueltas = Math.PI*2*1.5, t0 = performance.now();
-  const start = capas.map(c => c.rotation);
+  const start = performance.now();
+
+  // Configurar giros aleatorios por capa
+  const configs = [
+    { capa: capas[0], sentido: 1,  dur: 2000 + Math.random() * 1000, vueltas: 2 + Math.random() * 2 }, // externa: horario
+    { capa: capas[1], sentido: -1, dur: 2500 + Math.random() * 1000, vueltas: 2 + Math.random() * 2 }, // media: antihorario
+    { capa: capas[2], sentido: 1,  dur: 3000 + Math.random() * 1000, vueltas: 2 + Math.random() * 2 }  // interna: horario
+  ];
+
+  const inicios = capas.map(c => c.rotation);
   const ease = t => 1 - Math.pow(1 - t, 3);
-  function frame(t){
-    const k = Math.min(1, (t - t0)/dur);
-    const d = ease(k) * vueltas;
-    capas.forEach((c,i)=> c.rotation = start[i] + d);
+
+  function animar(now) {
+    let activo = false;
+    configs.forEach((cfg, i) => {
+      const t = Math.min(1, (now - start) / cfg.dur);
+      const delta = ease(t) * (Math.PI * 2 * cfg.vueltas * cfg.sentido);
+      cfg.capa.rotation = inicios[i] + delta;
+      if (t < 1) activo = true;
+    });
     drawAll();
-    if (k < 1) requestAnimationFrame(frame);
+    if (activo) requestAnimationFrame(animar);
   }
-  requestAnimationFrame(frame);
+
+  requestAnimationFrame(animar);
 });
 </script>
 </body>
