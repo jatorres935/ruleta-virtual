@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cartas de bio-arte</title>
+<style>
+  :root{
+    --fucsia:#E83E8C;
+    --fucsia-glow1:#F194C1;
+    --fucsia-glow2:#C2185B;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background:#fff;
+    color:#111;
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+  }
+  header{
+    text-align:center;
+    padding:24px 16px 8px;
+  }
+  header h1{
+    margin:0 0 6px;
+    font-size:1.8rem;
+  }
+  header p{
+    margin:0 0 10px;
+    color:#555;
+    font-size:0.95rem;
+  }
+
+  /* Contenedor general por grupos */
+  .grupo{
+    width:100%;
+    max-width:1100px;
+    margin:0 auto 26px;
+    padding:0 16px;
+  }
+  .grupo-titulo{
+    margin:10px 0 12px;
+    font-size:1.05rem;
+    color:#444;
+    font-weight:bold;
+  }
+  /* Cuadrícula de cartas */
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap:14px;
+  }
+  /* 3 por fila en desktop, 2 en tablet, 1 en móvil */
+  @media (max-width: 1100px){
+    .grid{ grid-template-columns: repeat(6, 1fr); }
+  }
+  @media (max-width: 700px){
+    .grid{ grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 480px){
+    .grid{ grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .thumb{
+    position:relative;
+    width:100%;
+    aspect-ratio: 3/4; /* cartas verticales */
+    border-radius:12px;
+    overflow:hidden;
+    background:#f2f2f2;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+    cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .thumb:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 18px rgba(0,0,0,.12);
+  }
+  .thumb img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+    background:#fff;
+  }
+
+  /* Botón Volver */
+  .volver{
+    position:fixed;
+    right:16px;
+    bottom:16px;
+    background:var(--fucsia);
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    padding:12px 20px;
+    font-size:1rem;
+    cursor:pointer;
+    box-shadow:0 0 10px var(--fucsia-glow1);
+    animation:glow 1s infinite alternate;
+    z-index:1000;
+  }
+  .volver:hover{ background:#C2185B; }
+  @keyframes glow{
+    0%{ box-shadow:0 0 10px var(--fucsia-glow1); }
+    100%{ box-shadow:0 0 24px var(--fucsia-glow2); }
+  }
+
+  /* MODAL pantalla completa */
+  .modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.8);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:999;
+    touch-action:none; /* evita scroll mientras se rota */
+  }
+  .modal.abierto{ display:flex; }
+
+  .cerrar{
+    position:absolute;
+    top:14px;
+    right:18px;
+    width:40px; height:40px;
+    border-radius:50%;
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    border:none;
+    font-size:1.4rem;
+    cursor:pointer;
+    backdrop-filter: blur(3px);
+  }
+  .cerrar:hover{ background:rgba(255,255,255,.22); }
+
+  /* Contenedor 3D */
+  .visor{
+    width:min(86vw, 520px);
+    aspect-ratio: 3/4;
+    position:relative;
+    perspective:1200px;
+  }
+  .tarjeta-3d{
+    width:100%;
+    height:100%;
+    position:relative;
+    transform-style:preserve-3d;
+    will-change: transform;
+    transition: transform .08s linear;
+    border-radius:14px;
+  }
+  .cara{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    backface-visibility:hidden;
+    border-radius:14px;
+    overflow:hidden;
+    background:#fff;
+  }
+  .cara img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+    background:#fff;
+  }
+  .cara.back{
+    transform: rotateY(180deg);
+  }
+
+  /* Indicador de gesto (opcional sutil) */
+  .hint{
+    position:absolute;
+    bottom:10px;
+    left:50%;
+    transform:translateX(-50%);
+    color:#fff;
+    font-size:.85rem;
+    opacity:.8;
+    pointer-events:none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Las cartas de bio-arte</h1>
+  <p>Toca una carta para ampliarla y desliza horizontalmente para ver el anverso y el reverso.</p>
+</header>
+
+<!-- === NA: Pureza humana === -->
+<section class="grupo">
+  <div class="grupo-titulo">Pureza humana (NA)</div>
+  <div class="grid">
+    <div class="thumb" data-front="NA_familia.png" data-back="NA_Respaldo.png">
+      <img src="NA_familia.png" alt="NA_familia">
+    </div>
+    <div class="thumb" data-front="NA_gen_pets.png" data-back="NA_Respaldo.png">
+      <img src="NA_gen_pets.png" alt="NA_gen_pets">
+    </div>
+    <div class="thumb" data-front="NA_microvenus.png" data-back="NA_Respaldo.png">
+      <img src="NA_microvenus.png" alt="NA_microvenus">
+    </div>
+  </div>
+</section>
+
+<!-- === RO: Hibridación Plantimal === -->
+<section class="grupo">
+  <div class="grupo-titulo">Hibridación Plantimal (RO)</div>
+  <div class="grid">
+    <div class="thumb" data-front="RO_cactus.png" data-back="RO_Respaldo.png">
+      <img src="RO_cactus.png" alt="RO_cactus">
+    </div>
+    <div class="thumb" data-front="RO_enigma.png" data-back="RO_Respaldo.png">
+      <img src="RO_enigma.png" alt="RO_enigma">
+    </div>
+    <div class="thumb" data-front="RO_psx.png" data-back="RO_Respaldo.png">
+      <img src="RO_psx.png" alt="RO_psx">
+    </div>
+  </div>
+</section>
+
+<!-- === VC: Hibridación humanimal === -->
+<section class="grupo">
+  <div class="grupo-titulo">Hibridación humanimal (VC)</div>
+  <div class="grid">
+    <div class="thumb" data-front="VC_caballo.png" data-back="VC_Respaldo.png">
+      <img src="VC_caballo.png" alt="VC_caballo">
+    </div>
+    <div class="thumb" data-front="VC_conejo.png" data-back="VC_Respaldo.png">
+      <img src="VC_conejo.png" alt="VC_conejo">
+    </div>
+    <div class="thumb" data-front="VC_delfin.png" data-back="VC_Respaldo.png">
+      <img src="VC_delfin.png" alt="VC_delfin">
+    </div>
+  </div>
+</section>
+
+<!-- === VO: Transhumanismo === -->
+<section class="grupo">
+  <div class="grupo-titulo">Transhumanismo (VO)</div>
+  <div class="grid">
+    <div class="thumb" data-front="VO_foragers.png" data-back="VO_Respaldo.png">
+      <img src="VO_foragers.png" alt="VO_foragers">
+    </div>
+    <div class="thumb" data-front="VO_posthuman.png" data-back="VO_Respaldo.png">
+      <img src="VO_posthuman.png" alt="VO_posthuman">
+    </div>
+    <div class="thumb" data-front="VO_robot.png" data-back="VO_Respaldo.png">
+      <img src="VO_robot.png" alt="VO_robot">
+    </div>
+  </div>
+</section>
+
+<!-- Botón Volver -->
+<button class="volver" id="btnVolver">Volver</button>
+
+<!-- Modal de carta ampliada -->
+<div class="modal" id="modal">
+  <button class="cerrar" id="btnCerrar" aria-label="Cerrar">✕</button>
+  <div class="visor">
+    <div class="tarjeta-3d" id="tarjeta3d">
+      <div class="cara front"><img id="imgFront" alt="cara frontal"></div>
+      <div class="cara back"><img id="imgBack" alt="cara respaldo"></div>
+    </div>
+    <div class="hint">Desliza para girar</div>
+  </div>
+</div>
+
+<script>
+  // Botón volver
+  document.getElementById('btnVolver').addEventListener('click', () => {
+    window.location.href = 'index.html';
+  });
+
+  const modal = document.getElementById('modal');
+  const tarjeta = document.getElementById('tarjeta3d');
+  const imgFront = document.getElementById('imgFront');
+  const imgBack  = document.getElementById('imgBack');
+  const btnCerrar = document.getElementById('btnCerrar');
+
+  // Abrir modal al tocar una carta
+  document.querySelectorAll('.thumb').forEach(el => {
+    el.addEventListener('click', () => {
+      const front = el.getAttribute('data-front');
+      const back  = el.getAttribute('data-back');
+      imgFront.src = front;
+      imgBack.src  = back;
+      // Reset posición
+      rotY = 0;
+      tarjeta.style.transform = `rotateY(${rotY}deg)`;
+      modal.classList.add('abierto');
+    });
+  });
+
+  // Cerrar modal
+  btnCerrar.addEventListener('click', () => modal.classList.remove('abierto'));
+  modal.addEventListener('click', (e) => {
+    // Cierra si se hace click fuera del visor
+    const visor = e.target.closest('.visor');
+    if (!visor) modal.classList.remove('abierto');
+  });
+
+  // Rotación táctil / mouse
+  let rotY = 0;
+  let dragging = false;
+  let startX = 0;
+  let startRotY = 0;
+
+  const startDrag = (clientX) => {
+    dragging = true;
+    startX = clientX;
+    startRotY = rotY;
+  };
+  const moveDrag = (clientX) => {
+    if (!dragging) return;
+    const dx = clientX - startX;
+    // Sensibilidad ajustada para giro suave (menor = más sensible)
+    const sensitivity = 0.5;
+    rotY = startRotY + dx * sensitivity;
+    tarjeta.style.transform = `rotateY(${rotY}deg)`;
+  };
+  const endDrag = () => { dragging = false; };
+
+  // Mouse
+  modal.addEventListener('mousedown', (e) => startDrag(e.clientX));
+  modal.addEventListener('mousemove', (e) => moveDrag(e.clientX));
+  window.addEventListener('mouseup', endDrag);
+
+  // Touch
+  modal.addEventListener('touchstart', (e) => {
+    if (e.touches.length) startDrag(e.touches[0].clientX);
+  }, {passive:true});
+  modal.addEventListener('touchmove', (e) => {
+    if (e.touches.length) moveDrag(e.touches[0].clientX);
+  }, {passive:true});
+  modal.addEventListener('touchend', endDrag);
+  modal.addEventListener('touchcancel', endDrag);
+
+  // Si el dispositivo rota, aseguramos que el modal siga estable
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      // Recalibra transform (mantiene la carta visible)
+      tarjeta.style.transform = `rotateY(${rotY}deg)`;
+    }, 300);
+  });
+</script>
+</body>
+</html>
