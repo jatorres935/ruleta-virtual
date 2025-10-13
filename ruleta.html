@@ -18,15 +18,16 @@ body {
   position: relative;
 }
 
-/* === Contenedor adaptable === */
+/* === Contenedor adaptable (ajustado al ensamble completo) === */
 #contenedor-ruleta {
   position: relative;
   width: 90vw;
-  max-width: 500px;
-  aspect-ratio: 1/1;
+  max-width: 550px; /* ligeramente más grande para incluir los soportes */
+  aspect-ratio: 1/1.15; /* un poco más alto que ancho, según el modelo */
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: visible;
 }
 
 /* === Soportes === */
@@ -36,20 +37,20 @@ body {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  pointer-events: none; /* no bloquea la interacción con la ruleta */
+  pointer-events: none;
   z-index: 0;
 }
 
 #soporte-adelante {
-  z-index: 3; /* sobre la ruleta */
+  z-index: 3;
 }
 
 /* === Canvas perfectamente redondo === */
 #ruleta {
   border-radius: 50%;
   cursor: grab;
-  width: 100%;
-  height: 100%;
+  width: 82%;  /* reducido ligeramente para encajar dentro del soporte */
+  height: auto;
   position: relative;
   z-index: 2;
   touch-action: none;
@@ -109,6 +110,10 @@ body {
   #contenedor-ruleta {
     width: 95vw;
     max-width: none;
+    aspect-ratio: 1/1.2; /* ligeramente más alto en móviles */
+  }
+  #ruleta {
+    width: 85%;
   }
   .boton-girar {
     width: 70px; height: 70px; font-size: 0.9em;
@@ -175,7 +180,7 @@ function init(){
 }
 
 function resizeCanvas() {
-  const size = Math.min(contenedor.clientWidth, contenedor.clientHeight);
+  const size = contenedor.clientWidth * 0.82; /* encaja dentro del soporte */
   baseW = baseH = size;
   canvas.width  = size * DPR;
   canvas.height = size * DPR;
