@@ -30,7 +30,7 @@ body {
   overflow: visible;
 }
 
-/* === Soportes (ajustados para alineación perfecta del triángulo) === */
+/* === Soportes === */
 #soporte-atras, #soporte-adelante {
   position: absolute;
   top: -2%;
@@ -53,26 +53,35 @@ body {
   width: 82%;
   height: auto;
   position: relative;
-  top: 4%; /* bajado ligeramente para centrar con el soporte */
+  top: 4%;
   z-index: 2;
   touch-action: none;
   display: block;
 }
 
-/* === Botones === */
+/* === Botón Girar (fucsia brillante) === */
 .boton-girar {
-  position: absolute; top: 20px; left: 20px;
-  width: 90px; height: 90px;
-  background-color: #e74c3c; color: #fff;
-  border: none; border-radius: 50%;
-  font-size: 1.1em; cursor: pointer;
+  position: relative;
+  margin-top: 15px;
+  width: 90px;
+  height: 90px;
+  background-color: #E83E8C; /* 🎨 fucsia fuerte */
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.1em;
+  cursor: pointer;
   z-index: 10;
-  display:flex; justify-content:center; align-items:center;
-  animation: brilloParpadeo 1s infinite alternate;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: brilloParpadeoFucsia 1s infinite alternate;
 }
-@keyframes brilloParpadeo {
-  0% { box-shadow: 0 0 10px #ff9999; }
-  100% { box-shadow: 0 0 25px #ff0000; }
+
+/* 💫 Efecto brillante fucsia */
+@keyframes brilloParpadeoFucsia {
+  0% { box-shadow: 0 0 10px #F194C1; }   /* rosa claro */
+  100% { box-shadow: 0 0 25px #C2185B; } /* fucsia profundo */
 }
 
 .boton-instrucciones {
@@ -122,10 +131,13 @@ body {
   }
   #ruleta {
     width: 85%;
-    top: 7%; /* también bajada proporcionalmente en móvil */
+    top: 7%;
   }
   .boton-girar {
-    width: 70px; height: 70px; font-size: 0.9em;
+    width: 70px;
+    height: 70px;
+    font-size: 0.9em;
+    margin-top: 10px;
   }
 }
 </style>
@@ -290,8 +302,19 @@ document.getElementById("btnGirar").addEventListener("click", () => {
   }
   requestAnimationFrame(animar);
 });
+
+/* === Mostrar instrucciones automáticamente al cargar === */
+window.addEventListener("load", () => {
+  modal.style.display = "flex";
+});
+
+/* ✅ NUEVO: corregir orientación en móviles */
+window.addEventListener("orientationchange", () => {
+  setTimeout(() => {
+    resizeCanvas();
+    drawAll();
+  }, 500); // Espera medio segundo para permitir que el dispositivo termine de rotar
+});
 </script>
 </body>
 </html>
-
-
