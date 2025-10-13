@@ -17,18 +17,31 @@ body {
   min-height: 100vh;
   position: relative;
 }
-/* Ruleta centrada y perfectamente redonda */
+
+/* === Contenedor adaptable para móviles y PC === */
+#contenedor-ruleta {
+  position: relative;
+  width: 90vw;
+  max-width: 500px; /* escala natural en PC */
+  aspect-ratio: 1/1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* === Canvas perfectamente redondo === */
 #ruleta {
   border-radius: 50%;
   cursor: grab;
-  width: 90vw;
-  max-width: 500px;
-  height: auto;
-  aspect-ratio: 1/1;
+  width: 100%;
+  height: 100%;
   position: relative;
   z-index: 1;
   touch-action: none;
+  display: block;
 }
+
+/* === Flecha de selección === */
 .flecha {
   position: absolute;
   top: 50%;
@@ -40,39 +53,77 @@ body {
   border-bottom: 50px solid black;
   z-index: 5; pointer-events:none;
 }
-/* Botones */
+
+/* === Botones === */
 .boton-girar {
   position: absolute; top: 20px; left: 20px;
-  width: 90px; height: 90px; background-color: #e74c3c; color: #fff;
-  border: none; border-radius: 50%; font-size: 1.1em; cursor: pointer;
-  z-index: 10; display:flex; justify-content:center; align-items:center;
+  width: 90px; height: 90px;
+  background-color: #e74c3c; color: #fff;
+  border: none; border-radius: 50%;
+  font-size: 1.1em; cursor: pointer;
+  z-index: 10;
+  display:flex; justify-content:center; align-items:center;
   animation: brilloParpadeo 1s infinite alternate;
 }
-@keyframes brilloParpadeo { 0%{box-shadow:0 0 10px #ff9999;} 100%{box-shadow:0 0 25px #ff0000;} }
+@keyframes brilloParpadeo {
+  0% { box-shadow: 0 0 10px #ff9999; }
+  100% { box-shadow: 0 0 25px #ff0000; }
+}
+
 .boton-instrucciones {
-  position: absolute; bottom: 10px; left: 10px; background-color:#28a745;
-  border:none; color:#fff; font-size:1em; padding:10px 20px; border-radius:8px;
-  cursor:pointer; z-index:10;
+  position: absolute; bottom: 10px; left: 10px;
+  background-color:#28a745;
+  border:none; color:#fff;
+  font-size:1em; padding:10px 20px;
+  border-radius:8px; cursor:pointer; z-index:10;
 }
 .boton-volver {
-  position: absolute; bottom: 10px; right: 10px; background-color:#3498db;
-  border:none; color:#fff; font-size:1em; padding:10px 20px; border-radius:8px;
-  cursor:pointer; z-index:10;
+  position: absolute; bottom: 10px; right: 10px;
+  background-color:#3498db;
+  border:none; color:#fff;
+  font-size:1em; padding:10px 20px;
+  border-radius:8px; cursor:pointer; z-index:10;
 }
-/* Modal instrucciones */
+
+/* === Modal instrucciones === */
 .modal {
-  display:none; position:fixed; z-index:100; inset:0; background:rgba(0,0,0,0.8);
+  display:none; position:fixed; z-index:100; inset:0;
+  background:rgba(0,0,0,0.8);
   justify-content:center; align-items:center;
 }
-.modal img { max-width:90%; max-height:90%; border-radius:10px; }
-.cerrar { position:absolute; top:20px; right:40px; font-size:2em; color:#fff; cursor:pointer; font-weight:bold; }
+.modal img {
+  max-width:90%;
+  max-height:90%;
+  border-radius:10px;
+}
+.cerrar {
+  position:absolute; top:20px; right:40px;
+  font-size:2em; color:#fff;
+  cursor:pointer; font-weight:bold;
+}
+
+/* === Escala responsiva adicional === */
+@media (max-width: 600px) {
+  #contenedor-ruleta {
+    width: 95vw;
+    max-width: none;
+  }
+  .flecha {
+    border-bottom: 35px solid black;
+  }
+  .boton-girar {
+    width: 70px; height: 70px; font-size: 0.9em;
+  }
+}
 </style>
 </head>
 <body>
 
-<!-- Ruleta -->
-<canvas id="ruleta"></canvas>
-<div class="flecha"></div>
+<!-- === Contenedor principal === -->
+<div id="contenedor-ruleta">
+  <canvas id="ruleta"></canvas>
+  <div class="flecha"></div>
+</div>
 
 <!-- Botones -->
 <button class="boton-girar" id="btnGirar">Girar</button>
@@ -86,21 +137,20 @@ body {
 </div>
 
 <script>
-/* === Ruleta multicapa con hit-test por alpha y escalado correcto === */
+/* === Ruleta multicapa con hit-test y escalado responsivo === */
 const canvas = document.getElementById("ruleta");
 const ctx = canvas.getContext("2d");
+const contenedor = document.getElementById("contenedor-ruleta");
 
-// Usa aquí los nombres de TUS PNG alineados
 const capas = [
-  { src: "ruleta_externa.png", rotation: 0, img:null, buf:null, bctx:null },
-  { src: "ruleta_media.png",   rotation: 0, img:null, buf:null, bctx:null },
-  { src: "ruleta_interna.png", rotation: 0, img:null, buf:null, bctx:null }
+  { src: "ruleta_externa_alineada.png", rotation: 0, img:null, buf:null, bctx:null },
+  { src: "ruleta_media_alineada.png",   rotation: 0, img:null, buf:null, bctx:null },
+  { src: "ruleta_interna_alineada.png", rotation: 0, img:null, buf:null, bctx:null }
 ];
 
 const DPR = Math.max(1, window.devicePixelRatio || 1);
 let baseW = 0, baseH = 0;
 
-// Carga
 let loaded = 0;
 capas.forEach(c => {
   const im = new Image();
@@ -113,14 +163,7 @@ capas.forEach(c => {
 });
 
 function init(){
-  baseW = capas[0].img.naturalWidth;
-  baseH = capas[0].img.naturalHeight;
-  canvas.width  = Math.round(baseW * DPR);
-  canvas.height = Math.round(baseH * DPR);
-  canvas.style.width  = baseW + "px";
-  canvas.style.height = baseH + "px";
-  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-
+  resizeCanvas();
   capas.forEach(c => {
     const b = document.createElement("canvas");
     b.width = baseW; b.height = baseH;
@@ -128,9 +171,22 @@ function init(){
     bctx.drawImage(c.img, 0, 0, baseW, baseH);
     c.buf = b; c.bctx = bctx;
   });
-
   drawAll();
 }
+
+/* Ajusta el canvas dinámicamente */
+function resizeCanvas() {
+  const size = Math.min(contenedor.clientWidth, contenedor.clientHeight);
+  baseW = baseH = size;
+  canvas.width  = size * DPR;
+  canvas.height = size * DPR;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+
+window.addEventListener("resize", () => {
+  resizeCanvas();
+  drawAll();
+});
 
 function drawAll(){
   ctx.clearRect(0, 0, baseW, baseH);
@@ -199,20 +255,16 @@ document.getElementById('cerrar').onclick = () => modal.style.display = 'none';
 window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
 document.getElementById("btnVolver").addEventListener("click", () => { window.location.href = "index.html"; });
 
-/* === Botón Girar: tres anillos giran con velocidades y sentidos distintos === */
+/* === Botón Girar (igual que antes) === */
 document.getElementById("btnGirar").addEventListener("click", () => {
   const start = performance.now();
-
-  // Configurar giros aleatorios por capa
   const configs = [
-    { capa: capas[0], sentido: 1,  dur: 2000 + Math.random() * 1000, vueltas: 2 + Math.random() * 2 }, // externa: horario
-    { capa: capas[1], sentido: -1, dur: 2500 + Math.random() * 1000, vueltas: 2 + Math.random() * 2 }, // media: antihorario
-    { capa: capas[2], sentido: 1,  dur: 3000 + Math.random() * 1000, vueltas: 2 + Math.random() * 2 }  // interna: horario
+    { capa: capas[0], sentido: 1,  dur: 2000 + Math.random() * 1000, vueltas: 2 + Math.random() * 2 },
+    { capa: capas[1], sentido: -1, dur: 2500 + Math.random() * 1000, vueltas: 2 + Math.random() * 2 },
+    { capa: capas[2], sentido: 1,  dur: 3000 + Math.random() * 1000, vueltas: 2 + Math.random() * 2 }
   ];
-
   const inicios = capas.map(c => c.rotation);
   const ease = t => 1 - Math.pow(1 - t, 3);
-
   function animar(now) {
     let activo = false;
     configs.forEach((cfg, i) => {
@@ -224,10 +276,8 @@ document.getElementById("btnGirar").addEventListener("click", () => {
     drawAll();
     if (activo) requestAnimationFrame(animar);
   }
-
   requestAnimationFrame(animar);
 });
 </script>
 </body>
 </html>
-
