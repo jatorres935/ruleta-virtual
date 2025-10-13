@@ -15,12 +15,43 @@ body {
   align-items: center;
   height: 100vh;
   text-align: center;
+  flex-direction: column;
 }
-h1 { font-size: 2.2em; margin-bottom: 10px; }
-h2 { font-size: 1.2em; color: #ddd; margin-bottom: 30px; }
-#btnEntrar {
-  font-size: 1.3em;
-  padding: 15px 30px;
+
+h1 {
+  font-size: 2.2em;
+  margin-bottom: 40px;
+}
+
+.seccion {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 80px;
+  flex-wrap: wrap;
+}
+
+.bloque {
+  max-width: 300px;
+  text-align: left;
+}
+
+h2 {
+  font-size: 1.2em;
+  margin-bottom: 10px;
+  color: #ddd;
+}
+
+p {
+  font-size: 1em;
+  color: #bbb;
+  margin-bottom: 20px;
+  line-height: 1.4em;
+}
+
+button {
+  font-size: 1.1em;
+  padding: 12px 25px;
   background-color: #3498db;
   color: white;
   border: none;
@@ -28,20 +59,43 @@ h2 { font-size: 1.2em; color: #ddd; margin-bottom: 30px; }
   cursor: pointer;
   transition: 0.3s;
 }
-#btnEntrar:hover { background-color: #1d6fa5; }
+
+button:hover {
+  background-color: #1d6fa5;
+}
 </style>
 </head>
 <body>
-  <div>
-    <h1>Especulaciones sobre posibles futuros de la crisis climática</h1>
-    <h2>Lector de emociones: Instrumento para identificar emociones</h2>
-    <button id="btnEntrar">Entrar</button>
+
+  <h1>Especulaciones sobre posibles futuros de la crisis climática</h1>
+
+  <div class="seccion">
+
+    <!-- Bloque Ruleta -->
+    <div class="bloque">
+      <h2>Lector de emociones:</h2>
+      <p>Instrumento para identificar emociones</p>
+      <button id="btnRuleta">Ruleta</button>
+    </div>
+
+    <!-- Bloque Cartas -->
+    <div class="bloque">
+      <h2>Las cartas:</h2>
+      <p>12 obras de bio-arte fueron seleccionadas y representadas en cartas con ilustraciones, el título de la obra, una descripción de la misma, información del autor y un código QR para obtener más información.</p>
+      <button id="btnCartas">Cartas</button>
+    </div>
+
   </div>
 
 <script>
-document.getElementById('btnEntrar').addEventListener('click', () => {
+document.getElementById('btnRuleta').addEventListener('click', () => {
   window.location.href = 'ruleta.html';
 });
+
+document.getElementById('btnCartas').addEventListener('click', () => {
+  window.location.href = 'cartas.html';
+});
 </script>
+
 </body>
 </html>
