@@ -23,6 +23,7 @@ h1 {
   margin-bottom: 40px;
 }
 
+/* Contenedor de las dos secciones */
 .seccion {
   display: flex;
   justify-content: center;
@@ -31,9 +32,18 @@ h1 {
   flex-wrap: wrap;
 }
 
+/* Bloques individuales */
 .bloque {
   max-width: 300px;
   text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Ajuste visual del bloque izquierdo */
+.bloque:first-child {
+  margin-top: 20px; /* lo baja ligeramente para centrar con el otro texto */
 }
 
 h2 {
@@ -49,19 +59,56 @@ p {
   line-height: 1.4em;
 }
 
+/* === Botones fucsia brillante === */
 button {
   font-size: 1.1em;
   padding: 12px 25px;
-  background-color: #3498db;
+  background-color: #E83E8C; /* 🎨 fucsia fuerte */
   color: white;
   border: none;
   border-radius: 10px;
   cursor: pointer;
   transition: 0.3s;
+  box-shadow: 0 0 10px #F194C1;
+  animation: brilloParpadeoFucsia 1s infinite alternate;
+}
+
+/* Efecto de brillo */
+@keyframes brilloParpadeoFucsia {
+  0% { box-shadow: 0 0 10px #F194C1; }   /* rosa claro */
+  100% { box-shadow: 0 0 25px #C2185B; } /* fucsia profundo */
 }
 
 button:hover {
-  background-color: #1d6fa5;
+  background-color: #C2185B;
+}
+
+/* === Adaptación a pantallas móviles === */
+@media (max-width: 600px) {
+  .seccion {
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .bloque {
+    text-align: center;
+    max-width: 90%;
+  }
+
+  h2 {
+    text-align: center;
+  }
+
+  p {
+    text-align: center;
+  }
+
+  button {
+    width: 80%;
+    max-width: 250px;
+    margin: 0 auto;
+  }
 }
 </style>
 </head>
