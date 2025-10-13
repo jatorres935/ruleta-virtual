@@ -53,7 +53,7 @@ body {
   width: 82%;
   height: auto;
   position: relative;
-  top: 4%;
+  top: 4%; /* ✅ centrado ajustado */
   z-index: 2;
   touch-action: none;
   display: block;
@@ -131,7 +131,7 @@ body {
   }
   #ruleta {
     width: 85%;
-    top:4%;
+    top: 4%; /* mantiene el valor actualizado */
   }
   .boton-girar {
     width: 70px;
@@ -308,14 +308,15 @@ window.addEventListener("load", () => {
   modal.style.display = "flex";
 });
 
-/* ✅ NUEVO: corregir orientación en móviles */
+/* ✅ OPTIMIZADO: mejor corrección de orientación en móviles */
 window.addEventListener("orientationchange", () => {
   setTimeout(() => {
+    activeLayer = null; // 🔄 cancela toques activos
     resizeCanvas();
     drawAll();
-  }, 500); // Espera medio segundo para permitir que el dispositivo termine de rotar
+    canvas.style.touchAction = "none"; // 🧭 recalibra gestos táctiles
+  }, 700); // espera ligera para estabilidad
 });
 </script>
 </body>
 </html>
-
