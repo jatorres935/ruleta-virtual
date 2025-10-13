@@ -66,8 +66,13 @@
       justify-items: center; /* ✅ centra las cartas */
     }
     .grid .thumb{
-      width: 95%; /* ✅ mantiene proporciones y uniformidad */
-      max-width: 180px; /* mantiene tamaño visual coherente */
+      width: 95%; /* mantiene proporciones y uniformidad */
+      max-width: 180px;
+    }
+    /* ✅ Centra la tercera carta solitaria en la segunda fila */
+    .grid .thumb:nth-child(3){
+      grid-column: 1 / -1;
+      justify-self: center;
     }
   }
 
