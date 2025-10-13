@@ -2,370 +2,227 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Cartas de bio-arte</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cartas de Bioarte</title>
 <style>
-  :root{
-    --fucsia:#E83E8C;
-    --fucsia-glow1:#F194C1;
-    --fucsia-glow2:#C2185B;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: white;
+  color: black;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+h1 {
+  text-align: center;
+  margin-top: 20px;
+}
+h2 {
+  margin-top: 40px;
+  margin-bottom: 10px;
+  font-size: 1.3em;
+  color: #E83E8C;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  width: 90%;
+  max-width: 800px;
+  justify-items: center;
+}
+.thumb {
+  position: relative;
+  width: 180px;
+  aspect-ratio: 3/4;
+  perspective: 1000px;
+  cursor: pointer;
+}
+.carta {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+}
+.thumb:hover .carta {
+  transform: rotateY(10deg);
+}
+.cara {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.cara img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: transparent;
+}
+.cara.atras {
+  transform: rotateY(180deg);
+}
+.visor {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+.visor.active {
+  display: flex;
+}
+.carta-grande {
+  width: 85vw;
+  max-width: 450px;
+  aspect-ratio: 3/4;
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
+}
+.carta-grande img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 10px;
+  background: transparent;
+}
+#cerrar {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 2em;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+.boton-volver {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #E83E8C;
+  border: none;
+  color: #fff;
+  font-size: 1em;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 10;
+  animation: brilloFucsia 1s infinite alternate;
+}
+@keyframes brilloFucsia {
+  0% { box-shadow: 0 0 10px #F194C1; }
+  100% { box-shadow: 0 0 25px #C2185B; }
+}
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
   }
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    font-family: Arial, sans-serif;
-    background:#fff;
-    color:#111;
-    display:flex;
-    flex-direction:column;
-    min-height:100vh;
+  .grid .thumb:nth-child(3) {
+    grid-column: 1 / -1;
+    justify-self: center;
   }
-  header{
-    text-align:center;
-    padding:24px 16px 8px;
-  }
-  header h1{
-    margin:0 0 6px;
-    font-size:1.8rem;
-  }
-  header p{
-    margin:0 0 10px;
-    color:#555;
-    font-size:0.95rem;
-  }
-
-  /* Contenedor general por grupos */
-  .grupo{
-    width:100%;
-    max-width:1100px;
-    margin:0 auto 26px;
-    padding:0 16px;
-  }
-  .grupo-titulo{
-    margin:10px 0 12px;
-    font-size:1.05rem;
-    color:#444;
-    font-weight:bold;
-  }
-
-  /* Cuadrícula de cartas */
-  .grid{
-    display:grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap:14px;
-  }
-  @media (max-width: 1100px){
-    .grid{ grid-template-columns: repeat(6, 1fr); }
-  }
-  @media (max-width: 700px){
-    .grid{ grid-template-columns: repeat(3, 1fr); }
-  }
-  @media (max-width: 480px){
-    .grid{
-      grid-template-columns: repeat(2, 1fr);
-      justify-items: center; /* ✅ centra las cartas */
-    }
-    .grid .thumb{
-      width: 95%; /* mantiene proporciones y uniformidad */
-      max-width: 180px;
-    }
-    /* ✅ Centra la tercera carta solitaria en la segunda fila */
-    .grid .thumb:nth-child(3){
-      grid-column: 1 / -1;
-      justify-self: center;
-    }
-  }
-
-  .thumb{
-    position:relative;
-    width:100%;
-    aspect-ratio: 3/4; /* cartas verticales */
-    border-radius:12px;
-    overflow:hidden;
-    background:#f2f2f2;
-    box-shadow:0 2px 10px rgba(0,0,0,.08);
-    cursor:pointer;
-    transition:transform .15s ease, box-shadow .15s ease;
-  }
-  .thumb:hover{
-    transform:translateY(-2px);
-    box-shadow:0 6px 18px rgba(0,0,0,.12);
-  }
-  .thumb img{
-    width:100%;
-    height:100%;
-    object-fit:contain;
-    display:block;
-    background:#fff;
-  }
-
-  /* Botón Volver */
-  .volver{
-    position:fixed;
-    right:16px;
-    bottom:16px;
-    background:var(--fucsia);
-    color:#fff;
-    border:none;
-    border-radius:10px;
-    padding:12px 20px;
-    font-size:1rem;
-    cursor:pointer;
-    box-shadow:0 0 10px var(--fucsia-glow1);
-    animation:glow 1s infinite alternate;
-    z-index:1000;
-  }
-  .volver:hover{ background:#C2185B; }
-  @keyframes glow{
-    0%{ box-shadow:0 0 10px var(--fucsia-glow1); }
-    100%{ box-shadow:0 0 24px var(--fucsia-glow2); }
-  }
-
-  /* MODAL pantalla completa */
-  .modal{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.8);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:999;
-    touch-action:none; /* evita scroll mientras se rota */
-  }
-  .modal.abierto{ display:flex; }
-
-  .cerrar{
-    position:absolute;
-    top:14px;
-    right:18px;
-    width:40px; height:40px;
-    border-radius:50%;
-    background:rgba(255,255,255,.12);
-    color:#fff;
-    border:none;
-    font-size:1.4rem;
-    cursor:pointer;
-    backdrop-filter: blur(3px);
-  }
-  .cerrar:hover{ background:rgba(255,255,255,.22); }
-
-  /* Contenedor 3D */
-  .visor{
-    width:min(86vw, 520px);
-    aspect-ratio: 3/4;
-    position:relative;
-    perspective:1200px;
-  }
-  .tarjeta-3d{
-    width:100%;
-    height:100%;
-    position:relative;
-    transform-style:preserve-3d;
-    will-change: transform;
-    transition: transform .08s linear;
-    border-radius:14px;
-  }
-  .cara{
-    position:absolute;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    backface-visibility:hidden;
-    border-radius:14px;
-    overflow:hidden;
-    background:#fff;
-  }
-  /* Por defecto (desktop/tablet): llenar ancho sin franjas */
-  .cara img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    object-position:center;
-    display:block;
-    background:#fff;
-  }
-  .cara.back{
-    transform: rotateY(180deg);
-  }
-
-  /* Indicador de gesto */
-  .hint{
-    position:absolute;
-    bottom:10px;
-    left:50%;
-    transform:translateX(-50%);
-    color:#fff;
-    font-size:.85rem;
-    opacity:.8;
-    pointer-events:none;
-  }
-
-  /* ✅ FIX SOLO EN MÓVIL: evitar que se corten las cartas en el modal */
-  @media (max-width: 600px){
-    .cara img{
-      object-fit:contain;   /* no recorta en móvil */
-      object-position:center;
-    }
-  }
+}
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Las cartas de bio-arte</h1>
-  <p>Toca una carta para ampliarla y desliza horizontalmente para ver el anverso y el reverso.</p>
-</header>
+<h1>Cartas de Bioarte</h1>
 
-<!-- === NA: Pureza humana === -->
-<section class="grupo">
-  <div class="grupo-titulo">Pureza humana (NA)</div>
-  <div class="grid">
-    <div class="thumb" data-front="NA_familia.png" data-back="NA_Respaldo.png">
-      <img src="NA_familia.png" alt="NA_familia">
-    </div>
-    <div class="thumb" data-front="NA_gen_pets.png" data-back="NA_Respaldo.png">
-      <img src="NA_gen_pets.png" alt="NA_gen_pets">
-    </div>
-    <div class="thumb" data-front="NA_microvenus.png" data-back="NA_Respaldo.png">
-      <img src="NA_microvenus.png" alt="NA_microvenus">
-    </div>
-  </div>
-</section>
+<h2>Pureza humana (NA)</h2>
+<div class="grid">
+  <div class="thumb"><div class="carta"><div class="cara"><img src="NA_familia.png"></div><div class="cara atras"><img src="NA_familia_back.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="NA_gen_pets.png"></div><div class="cara atras"><img src="NA_gen_pets_back.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="NA_microvenus.png"></div><div class="cara atras"><img src="NA_microvenus_back.png"></div></div></div>
+</div>
 
-<!-- === RO: Hibridación Plantimal === -->
-<section class="grupo">
-  <div class="grupo-titulo">Hibridación Plantimal (RO)</div>
-  <div class="grid">
-    <div class="thumb" data-front="RO_cactus.png" data-back="RO_Respaldo.png">
-      <img src="RO_cactus.png" alt="RO_cactus">
-    </div>
-    <div class="thumb" data-front="RO_enigma.png" data-back="RO_Respaldo.png">
-      <img src="RO_enigma.png" alt="RO_enigma">
-    </div>
-    <div class="thumb" data-front="RO_psx.png" data-back="RO_Respaldo.png">
-      <img src="RO_psx.png" alt="RO_psx">
-    </div>
-  </div>
-</section>
+<h2>Hibridación Plantimal (RO)</h2>
+<div class="grid">
+  <div class="thumb"><div class="carta"><div class="cara"><img src="RO_cactus.png"></div><div class="cara atras"><img src="RO_cactus_back.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="RO_enigma.png"></div><div class="cara atras"><img src="RO_enigma_back.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="RO_psx.png"></div><div class="cara atras"><img src="RO_psx_back.png"></div></div></div>
+</div>
 
-<!-- === VC: Hibridación humanimal === -->
-<section class="grupo">
-  <div class="grupo-titulo">Hibridación humanimal (VC)</div>
-  <div class="grid">
-    <div class="thumb" data-front="VC_caballo.png" data-back="VC_Respaldo.png">
-      <img src="VC_caballo.png" alt="VC_caballo">
-    </div>
-    <div class="thumb" data-front="VC_conejo.png" data-back="VC_Respaldo.png">
-      <img src="VC_conejo.png" alt="VC_conejo">
-    </div>
-    <div class="thumb" data-front="VC_delfin.png" data-back="VC_Respaldo.png">
-      <img src="VC_delfin.png" alt="VC_delfin">
-    </div>
-  </div>
-</section>
+<h2>Hibridación Humanimal (VC)</h2>
+<div class="grid">
+  <div class="thumb"><div class="carta"><div class="cara"><img src="VC_caballo.png"></div><div class="cara atras"><img src="VC_caballo_back.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="VC_conejo.png"></div><div class="cara atras"><img src="VC_conejo_back.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="VC_delfin.png"></div><div class="cara atras"><img src="VC_delfin_back.png"></div></div></div>
+</div>
 
-<!-- === VO: Transhumanismo === -->
-<section class="grupo">
-  <div class="grupo-titulo">Transhumanismo (VO)</div>
-  <div class="grid">
-    <div class="thumb" data-front="VO_foragers.png" data-back="VO_Respaldo.png">
-      <img src="VO_foragers.png" alt="VO_foragers">
-    </div>
-    <div class="thumb" data-front="VO_posthuman.png" data-back="VO_Respaldo.png">
-      <img src="VO_posthuman.png" alt="VO_posthuman">
-    </div>
-    <div class="thumb" data-front="VO_robot.png" data-back="VO_Respaldo.png">
-      <img src="VO_robot.png" alt="VO_robot">
-    </div>
-  </div>
-</section>
+<h2>Transhumanismo (VO)</h2>
+<div class="grid">
+  <div class="thumb"><div class="carta"><div class="cara"><img src="VO_foragers.png"></div><div class="cara atras"><img src="VO_foragers_back.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="VO_posthuman.png"></div><div class="cara atras"><img src="VO_posthuman_back.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="VO_robot.png"></div><div class="cara atras"><img src="VO_robot_back.png"></div></div></div>
+</div>
 
-<!-- Botón Volver -->
-<button class="volver" id="btnVolver">Volver</button>
-
-<!-- Modal de carta ampliada -->
-<div class="modal" id="modal">
-  <button class="cerrar" id="btnCerrar" aria-label="Cerrar">✕</button>
-  <div class="visor">
-    <div class="tarjeta-3d" id="tarjeta3d">
-      <div class="cara front"><img id="imgFront" alt="cara frontal"></div>
-      <div class="cara back"><img id="imgBack" alt="cara respaldo"></div>
-    </div>
-    <div class="hint">Desliza para girar</div>
+<div id="visor" class="visor">
+  <div id="cerrar">&times;</div>
+  <div class="carta-grande" id="cartaGrande">
+    <img id="frenteGrande" src="">
+    <img id="reversoGrande" src="">
   </div>
 </div>
 
+<button class="boton-volver" onclick="window.location.href='index.html'">Inicio</button>
+
 <script>
-  // Botón volver
-  document.getElementById('btnVolver').addEventListener('click', () => {
-    window.location.href = 'index.html';
+const visor = document.getElementById('visor');
+const cartaGrande = document.getElementById('cartaGrande');
+const frenteGrande = document.getElementById('frenteGrande');
+const reversoGrande = document.getElementById('reversoGrande');
+const cerrar = document.getElementById('cerrar');
+let rotY = 0;
+let startX = 0;
+let dragging = false;
+
+document.querySelectorAll('.thumb img').forEach(img => {
+  img.addEventListener('click', e => {
+    const front = e.target.getAttribute('src');
+    const back = front.replace('.png', '_back.png');
+    frenteGrande.src = front;
+    reversoGrande.src = back;
+    visor.classList.add('active');
+    rotY = 0;
+    cartaGrande.style.transform = `rotateY(${rotY}deg)`;
   });
+});
 
-  const modal = document.getElementById('modal');
-  const tarjeta = document.getElementById('tarjeta3d');
-  const imgFront = document.getElementById('imgFront');
-  const imgBack  = document.getElementById('imgBack');
-  const btnCerrar = document.getElementById('btnCerrar');
-
-  // Abrir modal al tocar una carta
-  document.querySelectorAll('.thumb').forEach(el => {
-    el.addEventListener('click', () => {
-      const front = el.getAttribute('data-front');
-      const back  = el.getAttribute('data-back');
-      imgFront.src = front;
-      imgBack.src  = back;
-      rotY = 0;
-      tarjeta.style.transform = `rotateY(${rotY}deg)`;
-      modal.classList.add('abierto');
-    });
-  });
-
-  // Cerrar modal
-  btnCerrar.addEventListener('click', () => modal.classList.remove('abierto'));
-  modal.addEventListener('click', (e) => {
-    const visor = e.target.closest('.visor');
-    if (!visor) modal.classList.remove('abierto');
-  });
-
-  // Rotación táctil / mouse
-  let rotY = 0;
-  let dragging = false;
-  let startX = 0;
-  let startRotY = 0;
-
-  const startDrag = (clientX) => {
-    dragging = true;
-    startX = clientX;
-    startRotY = rotY;
-  };
-  const moveDrag = (clientX) => {
-    if (!dragging) return;
-    const dx = clientX - startX;
-    const sensitivity = 0.5;
-    rotY = startRotY + dx * sensitivity;
-    tarjeta.style.transform = `rotateY(${rotY}deg)`;
-  };
-  const endDrag = () => { dragging = false; };
-
-  modal.addEventListener('mousedown', (e) => startDrag(e.clientX));
-  modal.addEventListener('mousemove', (e) => moveDrag(e.clientX));
-  window.addEventListener('mouseup', endDrag);
-
-  modal.addEventListener('touchstart', (e) => {
-    if (e.touches.length) startDrag(e.touches[0].clientX);
-  }, {passive:true});
-  modal.addEventListener('touchmove', (e) => {
-    if (e.touches.length) moveDrag(e.touches[0].clientX);
-  }, {passive:true});
-  modal.addEventListener('touchend', endDrag);
-  modal.addEventListener('touchcancel', endDrag);
-
-  window.addEventListener('orientationchange', () => {
-    setTimeout(() => {
-      tarjeta.style.transform = `rotateY(${rotY}deg)`;
-    }, 300);
-  });
+visor.addEventListener('mousedown', e => {
+  dragging = true;
+  startX = e.clientX;
+});
+visor.addEventListener('mousemove', e => {
+  if(!dragging) return;
+  const delta = e.clientX - startX;
+  rotY += delta * 0.3;
+  cartaGrande.style.transform = `rotateY(${rotY}deg)`;
+  startX = e.clientX;
+});
+visor.addEventListener('mouseup', () => dragging = false);
+visor.addEventListener('mouseleave', () => dragging = false);
+visor.addEventListener('touchstart', e => {
+  dragging = true;
+  startX = e.touches[0].clientX;
+});
+visor.addEventListener('touchmove', e => {
+  if(!dragging) return;
+  const delta = e.touches[0].clientX - startX;
+  rotY += delta * 0.3;
+  cartaGrande.style.transform = `rotateY(${rotY}deg)`;
+  startX = e.touches[0].clientX;
+});
+visor.addEventListener('touchend', () => dragging = false);
+cerrar.addEventListener('click', () => visor.classList.remove('active'));
 </script>
+
 </body>
 </html>
