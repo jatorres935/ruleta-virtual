@@ -19,6 +19,18 @@ h1 {
   text-align: center;
   margin-top: 20px;
 }
+.boton-aleatorio {
+  margin-top: 10px;
+  background-color: #E83E8C;
+  border: none;
+  color: #fff;
+  font-size: 1em;
+  padding: 15px 30px;
+  border-radius: 50px;
+  cursor: pointer;
+  z-index: 10;
+  animation: brilloFucsia 1s infinite alternate;
+}
 h2 {
   margin-top: 40px;
   margin-bottom: 10px;
@@ -145,33 +157,34 @@ h2 {
 <body>
 
 <h1>Cartas de Bioarte</h1>
+<button class="boton-aleatorio" id="btnAleatorio">Escoger carta</button>
 
 <h2>Pureza humana (NA)</h2>
 <div class="grid">
-  <div class="thumb"><div class="carta"><div class="cara"><img src="NA_familia.png"></div><div class="cara atras"><img src="NA_familia_back.png"></div></div></div>
-  <div class="thumb"><div class="carta"><div class="cara"><img src="NA_gen_pets.png"></div><div class="cara atras"><img src="NA_gen_pets_back.png"></div></div></div>
-  <div class="thumb"><div class="carta"><div class="cara"><img src="NA_microvenus.png"></div><div class="cara atras"><img src="NA_microvenus_back.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="NA_familia_back.png"></div><div class="cara atras"><img src="NA_familia.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="NA_gen_pets_back.png"></div><div class="cara atras"><img src="NA_gen_pets.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="NA_microvenus_back.png"></div><div class="cara atras"><img src="NA_microvenus.png"></div></div></div>
 </div>
 
 <h2>Hibridación Plantimal (RO)</h2>
 <div class="grid">
-  <div class="thumb"><div class="carta"><div class="cara"><img src="RO_cactus.png"></div><div class="cara atras"><img src="RO_cactus_back.png"></div></div></div>
-  <div class="thumb"><div class="carta"><div class="cara"><img src="RO_enigma.png"></div><div class="cara atras"><img src="RO_enigma_back.png"></div></div></div>
-  <div class="thumb"><div class="carta"><div class="cara"><img src="RO_psx.png"></div><div class="cara atras"><img src="RO_psx_back.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="RO_cactus_back.png"></div><div class="cara atras"><img src="RO_cactus.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="RO_enigma_back.png"></div><div class="cara atras"><img src="RO_enigma.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="RO_psx_back.png"></div><div class="cara atras"><img src="RO_psx.png"></div></div></div>
 </div>
 
 <h2>Hibridación Humanimal (VC)</h2>
 <div class="grid">
-  <div class="thumb"><div class="carta"><div class="cara"><img src="VC_caballo.png"></div><div class="cara atras"><img src="VC_caballo_back.png"></div></div></div>
-  <div class="thumb"><div class="carta"><div class="cara"><img src="VC_conejo.png"></div><div class="cara atras"><img src="VC_conejo_back.png"></div></div></div>
-  <div class="thumb"><div class="carta"><div class="cara"><img src="VC_delfin.png"></div><div class="cara atras"><img src="VC_delfin_back.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="VC_caballo_back.png"></div><div class="cara atras"><img src="VC_caballo.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="VC_conejo_back.png"></div><div class="cara atras"><img src="VC_conejo.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="VC_delfin_back.png"></div><div class="cara atras"><img src="VC_delfin.png"></div></div></div>
 </div>
 
 <h2>Transhumanismo (VO)</h2>
 <div class="grid">
-  <div class="thumb"><div class="carta"><div class="cara"><img src="VO_foragers.png"></div><div class="cara atras"><img src="VO_foragers_back.png"></div></div></div>
-  <div class="thumb"><div class="carta"><div class="cara"><img src="VO_posthuman.png"></div><div class="cara atras"><img src="VO_posthuman_back.png"></div></div></div>
-  <div class="thumb"><div class="carta"><div class="cara"><img src="VO_robot.png"></div><div class="cara atras"><img src="VO_robot_back.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="VO_foragers_back.png"></div><div class="cara atras"><img src="VO_foragers.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="VO_posthuman_back.png"></div><div class="cara atras"><img src="VO_posthuman.png"></div></div></div>
+  <div class="thumb"><div class="carta"><div class="cara"><img src="VO_robot_back.png"></div><div class="cara atras"><img src="VO_robot.png"></div></div></div>
 </div>
 
 <div id="visor" class="visor">
@@ -190,27 +203,21 @@ const cartaGrande = document.getElementById('cartaGrande');
 const frenteGrande = document.getElementById('frenteGrande');
 const reversoGrande = document.getElementById('reversoGrande');
 const cerrar = document.getElementById('cerrar');
-
 let rotY = 0;
+let targetRotY = 0;
 let startX = 0;
 let dragging = false;
-let targetRotY = 0;
 
-// apertura de carta
-document.querySelectorAll('.thumb img').forEach(img => {
-  img.addEventListener('click', e => {
-    const front = e.target.getAttribute('src');
-    const back = front.replace('.png', '_back.png');
-    frenteGrande.src = front;
-    reversoGrande.src = back;
-    visor.classList.add('active');
-    rotY = 0;
-    targetRotY = 0;
-    cartaGrande.style.transform = `rotateY(${rotY}deg)`;
-  });
-});
+// Lista de todas las cartas (solo nombres base)
+const cartas = [
+  "NA_familia","NA_gen_pets","NA_microvenus",
+  "RO_cactus","RO_enigma","RO_psx",
+  "VC_caballo","VC_conejo","VC_delfin",
+  "VO_foragers","VO_posthuman","VO_robot"
+];
+let ultimaCarta = "";
 
-// suavizado del movimiento
+// animación suave
 function animate() {
   rotY += (targetRotY - rotY) * 0.1;
   cartaGrande.style.transform = `rotateY(${rotY}deg)`;
@@ -218,20 +225,36 @@ function animate() {
 }
 animate();
 
-// eventos de movimiento
-function startDrag(x) {
-  dragging = true;
-  startX = x;
-}
-function moveDrag(x) {
-  if (!dragging) return;
-  const delta = x - startX;
-  targetRotY += delta * 0.4;
-  startX = x;
-}
-function endDrag() {
-  dragging = false;
-}
+// selección manual
+document.querySelectorAll('.thumb img').forEach(img => {
+  img.addEventListener('click', e => {
+    const src = e.target.getAttribute('src');
+    const base = src.replace('_back.png','').replace('.png','');
+    frenteGrande.src = base + ".png";
+    reversoGrande.src = base + "_back.png";
+    visor.classList.add('active');
+    rotY = 0; targetRotY = 0;
+    cartaGrande.style.transform = `rotateY(${rotY}deg)`;
+  });
+});
+
+// selección aleatoria
+document.getElementById('btnAleatorio').addEventListener('click', () => {
+  let seleccion;
+  do { seleccion = cartas[Math.floor(Math.random() * cartas.length)]; }
+  while (seleccion === ultimaCarta);
+  ultimaCarta = seleccion;
+  frenteGrande.src = seleccion + ".png";
+  reversoGrande.src = seleccion + "_back.png";
+  visor.classList.add('active');
+  rotY = 0; targetRotY = 0;
+  cartaGrande.style.transform = `rotateY(${rotY}deg)`;
+});
+
+// arrastre suave
+function startDrag(x) { dragging = true; startX = x; }
+function moveDrag(x) { if (!dragging) return; const d = x - startX; targetRotY += d * 0.4; startX = x; }
+function endDrag() { dragging = false; }
 
 visor.addEventListener('mousedown', e => startDrag(e.clientX));
 visor.addEventListener('mousemove', e => moveDrag(e.clientX));
@@ -240,7 +263,6 @@ visor.addEventListener('mouseleave', endDrag);
 visor.addEventListener('touchstart', e => startDrag(e.touches[0].clientX));
 visor.addEventListener('touchmove', e => moveDrag(e.touches[0].clientX));
 visor.addEventListener('touchend', endDrag);
-
 cerrar.addEventListener('click', () => visor.classList.remove('active'));
 </script>
 
