@@ -12,34 +12,54 @@ body {
   color: black;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end; /* ruleta tocando parte inferior del recorte */
   flex-direction: column;
   min-height: 100vh;
   position: relative;
+  overflow: hidden;
 }
-/* Ruleta centrada y perfectamente redonda */
+
+/* contenedor que recorta la parte inferior de la ruleta */
+#contenedor-ruleta {
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+  aspect-ratio: 2/1; /* muestra solo la mitad superior */
+  overflow: hidden; /* recorta la parte inferior */
+  background: white; /* zona “blanca” inferior */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 40px;
+}
+
+/* Ruleta completa, centrada pero sobresaliendo por abajo */
 #ruleta {
   border-radius: 50%;
   cursor: grab;
-  width: 90vw;
-  max-width: 500px;
+  width: 180%; /* agrandada */
+  max-width: none;
   height: auto;
   aspect-ratio: 1/1;
   position: relative;
   z-index: 1;
   touch-action: none;
+  transform: translateY(25%); /* sube un poco para que el corte quede en la mitad */
 }
+
+/* Flecha centrada en el borde visible */
 .flecha {
   position: absolute;
-  top: 50%;
+  bottom: 0;
   left: 50%;
-  transform: translate(-50%, -100%);
+  transform: translate(-50%, 50%); /* justo en el borde */
   width: 0; height: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-bottom: 50px solid black;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 60px solid black;
   z-index: 5; pointer-events:none;
 }
+
 /* Botones */
 .boton-girar {
   position: absolute; top: 20px; left: 20px;
@@ -49,6 +69,7 @@ body {
   animation: brilloParpadeo 1s infinite alternate;
 }
 @keyframes brilloParpadeo { 0%{box-shadow:0 0 10px #ff9999;} 100%{box-shadow:0 0 25px #ff0000;} }
+
 .boton-instrucciones {
   position: absolute; bottom: 10px; left: 10px; background-color:#28a745;
   border:none; color:#fff; font-size:1em; padding:10px 20px; border-radius:8px;
@@ -59,6 +80,7 @@ body {
   border:none; color:#fff; font-size:1em; padding:10px 20px; border-radius:8px;
   cursor:pointer; z-index:10;
 }
+
 /* Modal instrucciones */
 .modal {
   display:none; position:fixed; z-index:100; inset:0; background:rgba(0,0,0,0.8);
@@ -70,9 +92,11 @@ body {
 </head>
 <body>
 
-<!-- Ruleta -->
-<canvas id="ruleta"></canvas>
-<div class="flecha"></div>
+<!-- Contenedor recortador -->
+<div id="contenedor-ruleta">
+  <canvas id="ruleta"></canvas>
+  <div class="flecha"></div>
+</div>
 
 <!-- Botones -->
 <button class="boton-girar" id="btnGirar">Girar</button>
@@ -90,7 +114,6 @@ body {
 const canvas = document.getElementById("ruleta");
 const ctx = canvas.getContext("2d");
 
-// Usa aquí los nombres de TUS PNG alineados
 const capas = [
   { src: "ruleta_externa.png", rotation: 0, img:null, buf:null, bctx:null },
   { src: "ruleta_media.png",   rotation: 0, img:null, buf:null, bctx:null },
@@ -100,7 +123,6 @@ const capas = [
 const DPR = Math.max(1, window.devicePixelRatio || 1);
 let baseW = 0, baseH = 0;
 
-// Carga
 let loaded = 0;
 capas.forEach(c => {
   const im = new Image();
@@ -163,7 +185,6 @@ function pickLayer(clientX, clientY){
   return null;
 }
 
-/* Interacción independiente por capa */
 let activeLayer = null, startAngle = 0, startRotation = 0;
 
 canvas.addEventListener("pointerdown", e => {
@@ -199,20 +220,16 @@ document.getElementById('cerrar').onclick = () => modal.style.display = 'none';
 window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
 document.getElementById("btnVolver").addEventListener("click", () => { window.location.href = "index.html"; });
 
-/* === Botón Girar: tres anillos giran con velocidades y sentidos distintos === */
+/* === Botón Girar (igual que antes) === */
 document.getElementById("btnGirar").addEventListener("click", () => {
   const start = performance.now();
-
-  // Configurar giros aleatorios por capa
   const configs = [
-    { capa: capas[0], sentido: 1,  dur: 2000 + Math.random() * 1000, vueltas: 2 + Math.random() * 2 }, // externa: horario
-    { capa: capas[1], sentido: -1, dur: 2500 + Math.random() * 1000, vueltas: 2 + Math.random() * 2 }, // media: antihorario
-    { capa: capas[2], sentido: 1,  dur: 3000 + Math.random() * 1000, vueltas: 2 + Math.random() * 2 }  // interna: horario
+    { capa: capas[0], sentido: 1,  dur: 2000 + Math.random() * 1000, vueltas: 2 + Math.random() * 2 },
+    { capa: capas[1], sentido: -1, dur: 2500 + Math.random() * 1000, vueltas: 2 + Math.random() * 2 },
+    { capa: capas[2], sentido: 1,  dur: 3000 + Math.random() * 1000, vueltas: 2 + Math.random() * 2 }
   ];
-
   const inicios = capas.map(c => c.rotation);
   const ease = t => 1 - Math.pow(1 - t, 3);
-
   function animar(now) {
     let activo = false;
     configs.forEach((cfg, i) => {
@@ -224,7 +241,6 @@ document.getElementById("btnGirar").addEventListener("click", () => {
     drawAll();
     if (activo) requestAnimationFrame(animar);
   }
-
   requestAnimationFrame(animar);
 });
 </script>
