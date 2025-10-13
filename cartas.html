@@ -176,12 +176,12 @@
     overflow:hidden;
     background:#fff;
   }
-  /* ✅ Ajuste lateral perfecto: elimina bordes blancos */
+  /* Por defecto (desktop/tablet): llenar ancho sin franjas */
   .cara img{
     width:100%;
     height:100%;
-    object-fit:cover;        /* llena el ancho sin franjas blancas */
-    object-position:center;  /* mantiene centrado frente y reverso */
+    object-fit:cover;
+    object-position:center;
     display:block;
     background:#fff;
   }
@@ -199,6 +199,14 @@
     font-size:.85rem;
     opacity:.8;
     pointer-events:none;
+  }
+
+  /* ✅ FIX SOLO EN MÓVIL: evitar que se corten las cartas en el modal */
+  @media (max-width: 600px){
+    .cara img{
+      object-fit:contain;   /* no recorta en móvil */
+      object-position:center;
+    }
   }
 </style>
 </head>
