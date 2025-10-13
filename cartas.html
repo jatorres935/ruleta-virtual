@@ -85,8 +85,9 @@ h2 {
   max-width: 450px;
   aspect-ratio: 3/4;
   transform-style: preserve-3d;
-  transition: transform 0.5s;
+  transition: transform 0.15s ease-out;
   position: relative;
+  will-change: transform;
 }
 .carta-grande img {
   width: 100%;
@@ -189,10 +190,13 @@ const cartaGrande = document.getElementById('cartaGrande');
 const frenteGrande = document.getElementById('frenteGrande');
 const reversoGrande = document.getElementById('reversoGrande');
 const cerrar = document.getElementById('cerrar');
+
 let rotY = 0;
 let startX = 0;
 let dragging = false;
+let targetRotY = 0;
 
+// apertura de carta
 document.querySelectorAll('.thumb img').forEach(img => {
   img.addEventListener('click', e => {
     const front = e.target.getAttribute('src');
@@ -201,35 +205,42 @@ document.querySelectorAll('.thumb img').forEach(img => {
     reversoGrande.src = back;
     visor.classList.add('active');
     rotY = 0;
+    targetRotY = 0;
     cartaGrande.style.transform = `rotateY(${rotY}deg)`;
   });
 });
 
-visor.addEventListener('mousedown', e => {
-  dragging = true;
-  startX = e.clientX;
-});
-visor.addEventListener('mousemove', e => {
-  if(!dragging) return;
-  const delta = e.clientX - startX;
-  rotY += delta * 0.3;
+// suavizado del movimiento
+function animate() {
+  rotY += (targetRotY - rotY) * 0.1;
   cartaGrande.style.transform = `rotateY(${rotY}deg)`;
-  startX = e.clientX;
-});
-visor.addEventListener('mouseup', () => dragging = false);
-visor.addEventListener('mouseleave', () => dragging = false);
-visor.addEventListener('touchstart', e => {
+  requestAnimationFrame(animate);
+}
+animate();
+
+// eventos de movimiento
+function startDrag(x) {
   dragging = true;
-  startX = e.touches[0].clientX;
-});
-visor.addEventListener('touchmove', e => {
-  if(!dragging) return;
-  const delta = e.touches[0].clientX - startX;
-  rotY += delta * 0.3;
-  cartaGrande.style.transform = `rotateY(${rotY}deg)`;
-  startX = e.touches[0].clientX;
-});
-visor.addEventListener('touchend', () => dragging = false);
+  startX = x;
+}
+function moveDrag(x) {
+  if (!dragging) return;
+  const delta = x - startX;
+  targetRotY += delta * 0.4;
+  startX = x;
+}
+function endDrag() {
+  dragging = false;
+}
+
+visor.addEventListener('mousedown', e => startDrag(e.clientX));
+visor.addEventListener('mousemove', e => moveDrag(e.clientX));
+visor.addEventListener('mouseup', endDrag);
+visor.addEventListener('mouseleave', endDrag);
+visor.addEventListener('touchstart', e => startDrag(e.touches[0].clientX));
+visor.addEventListener('touchmove', e => moveDrag(e.touches[0].clientX));
+visor.addEventListener('touchend', endDrag);
+
 cerrar.addEventListener('click', () => visor.classList.remove('active'));
 </script>
 
